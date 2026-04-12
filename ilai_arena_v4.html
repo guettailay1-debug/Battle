@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--card:#16161f;--border:#2a2a3a;--gold:#e5c46a;--red:#e05555;--blue:#5599e0;--cyan:#4ae0d0;--green:#4ade80;--purple:#c084fc;--text:#e8e8f0;--muted:#6a6a8a;--font:'Segoe UI',system-ui,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+
+/* NAV */
+.topbar{display:flex;align-items:center;gap:10px;padding:11px 20px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--red),var(--blue));border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-size:14px;font-weight:700;letter-spacing:1px;color:var(--gold)}
+.logo-sub{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.nav{display:flex;gap:3px;margin-left:auto}
+.nb{padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--muted);transition:all .15s;font-family:var(--font)}
+.nb:hover{background:var(--bg3);color:var(--text)}
+.nb.active{background:var(--bg3);color:var(--text);border-color:var(--border)}
+.badge{background:var(--red);color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px}
+.badge.cyan{background:var(--cyan);color:#000}
+
+.page{display:none;max-width:1200px;margin:0 auto;padding:16px}
+.page.active{display:block}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text);transition:all .15s;font-family:var(--font);font-weight:500}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn.red{background:#2a0808;border-color:var(--red);color:var(--red)}
+.btn.red:hover{background:#3a1010}
+.btn.blue{background:#08102a;border-color:var(--blue);color:var(--blue)}
+.btn.blue:hover{background:#0d1835}
+.btn.gold{background:#1a1200;border-color:var(--gold);color:var(--gold)}
+.btn.gold:hover{background:#251900}
+.btn.cyan{background:#001a18;border-color:var(--cyan);color:var(--cyan)}
+.btn.cyan:hover{background:#002520}
+.btn.purple{background:#180a2a;border-color:var(--purple);color:var(--purple)}
+.btn.purple:hover{background:#200f38}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.card-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card-title .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* HOME PAGE */
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:800px){.home-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.home-grid{grid-template-columns:1fr}}
+.stat-big{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-big .num{font-size:28px;font-weight:700;margin-bottom:3px}
+.stat-big .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.stat-big.red-accent{border-color:#e0555530}
+.stat-big.blue-accent{border-color:#5599e030}
+.stat-big.gold-accent{border-color:#e5c46a30}
+.last-game-banner{background:linear-gradient(135deg,#1a0808,#080818);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.last-game-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),var(--blue))}
+.last-game-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.podium-row{display:flex;gap:10px;flex-wrap:wrap}
+.podium-item{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;flex:1;min-width:120px}
+.podium-item.first{border-color:#b8952a}
+.podium-item.second{border-color:#666}
+.podium-item.third{border-color:#7a5a3a}
+.podium-medal{font-size:18px}
+.podium-info{flex:1}
+.podium-name{font-size:13px;font-weight:600}
+.podium-sub{font-size:11px;color:var(--muted)}
+.recent-games{display:flex;flex-direction:column;gap:6px}
+.game-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:8px 12px;cursor:pointer;transition:all .15s}
+.game-row:hover{border-color:var(--blue)}
+.game-row .gn{font-size:12px;font-weight:600;min-width:60px;color:var(--gold)}
+.game-row .gw{flex:1;font-size:12px;color:var(--muted)}
+.game-row .gd{font-size:11px;color:var(--muted)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.2s infinite;display:inline-block;margin-right:4px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* WATCH PAGE */
+.watch-layout{display:grid;grid-template-columns:1fr 280px;gap:12px;align-items:start}
+@media(max-width:750px){.watch-layout{grid-template-columns:1fr}}
+.arena-outer{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+#arenaCanvas{display:block;width:100%;aspect-ratio:1/1;background:#050508;image-rendering:pixelated}
+.kill-feed{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:3px;pointer-events:none}
+.ke{background:rgba(5,5,15,.88);color:var(--gold);font-size:10px;padding:3px 8px;border-radius:4px;white-space:nowrap;border-left:2px solid var(--red)}
+.arena-bar{display:flex;gap:7px;padding:9px 12px;align-items:center;flex-wrap:wrap;background:var(--bg2);border-top:1px solid var(--border)}
+.chip{font-size:11px;color:var(--muted);padding:3px 8px;background:var(--bg3);border-radius:5px;border:1px solid var(--border)}
+.chip span{color:var(--text);font-weight:600}
+.watch-sidebar{display:flex;flex-direction:column;gap:10px}
+.p-item{display:flex;align-items:center;gap:7px;padding:5px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px;transition:all .15s}
+.p-item.alive{border-color:#4ade8030}
+.p-item.dead{opacity:.4}
+.p-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;overflow:hidden;border:1px solid transparent}
+.p-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.p-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-hp{font-size:10px;color:var(--muted)}
+.p-type-tag{font-size:9px;padding:1px 5px;border-radius:4px}
+.p-type-tag.bot{background:#2a1040;color:var(--purple)}
+.p-type-tag.yt{background:#0a2010;color:var(--green)}
+.power-icon{font-size:13px;margin-left:2px}
+
+/* ADMIN SIDEBAR */
+.adm-participant-list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto}
+.p-remove{cursor:pointer;color:var(--muted);font-size:13px;line-height:1;padding:2px}
+.p-remove:hover{color:var(--red)}
+.add-row{display:flex;gap:5px;margin-top:6px}
+.add-row input,.settings-input{padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;font-family:var(--font)}
+.add-row input{flex:1;min-width:0}
+.bot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:5px}
+.bot-btn{padding:4px;font-size:10px;border-radius:5px;cursor:pointer;border:1px solid #3a1a5a;background:#1a0830;color:var(--purple);text-align:center;transition:all .15s}
+.bot-btn:hover{background:#250f45}
+.game-btns{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.range-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.range-row label{font-size:12px;color:var(--muted);min-width:90px}
+.range-row input[type=range]{flex:1;accent-color:var(--blue)}
+.range-row .val{font-size:12px;font-weight:600;min-width:36px;text-align:right;color:var(--text)}
+.power-cards{display:flex;flex-direction:column;gap:7px}
+.power-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px}
+.power-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.power-header .icon{font-size:18px}
+.power-header .name{font-size:13px;font-weight:600}
+.power-header .desc{font-size:11px;color:var(--muted);flex:1}
+.power-target{display:flex;align-items:center;gap:6px;margin-top:6px}
+.power-target label{font-size:11px;color:var(--muted)}
+.power-target input{flex:1;padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:11px;font-family:var(--font)}
+.kill-reward-row{display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
+.kill-reward-row label{font-size:12px;flex:1}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0}
+.toggle.on{background:var(--green);border-color:var(--green)}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all .2s}
+.toggle.on::after{left:18px}
+
+/* STATS PAGE */
+.stats-layout{display:grid;grid-template-columns:1fr;gap:14px}
+.search-banner{background:linear-gradient(135deg,#0d0818,#080d18);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative;overflow:hidden}
+.search-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.search-banner h2{font-size:15px;font-weight:700;margin-bottom:4px}
+.search-banner p{font-size:12px;color:var(--muted);margin-bottom:12px}
+.search-row{display:flex;gap:8px;flex-wrap:wrap}
+.search-row input{padding:8px 12px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;font-family:var(--font);flex:1;min-width:150px}
+.player-result-card{background:var(--bg2);border:1px solid var(--blue);border-radius:10px;padding:14px;margin-top:12px;display:none}
+.player-result-card .pname{font-size:18px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.player-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:500px){.player-stat-grid{grid-template-columns:1fr 1fr}}
+.ps-box{background:var(--card);border-radius:7px;padding:8px;text-align:center}
+.ps-box .n{font-size:20px;font-weight:700}
+.ps-box .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.ps-box.red .n{color:var(--red)}
+.ps-box.blue .n{color:var(--blue)}
+.ps-box.gold .n{color:var(--gold)}
+.ps-box.green .n{color:var(--green)}
+.recent-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.ps-game-row{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--card);border-radius:6px;font-size:12px;margin-bottom:4px}
+.ps-rank{min-width:28px;font-weight:700;color:var(--gold)}
+.game-select-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+.game-select-row select{padding:7px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:12px;font-family:var(--font)}
+.full-table{width:100%;border-collapse:collapse;font-size:12px}
+.full-table th{text-align:left;padding:7px 10px;font-size:10px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px}
+.full-table td{padding:7px 10px;border-bottom:1px solid #1a1a2a}
+.full-table tr:last-child td{border-bottom:none}
+.full-table tr:hover td{background:#16161f}
+
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:50vh}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;width:280px;text-align:center}
+.login-card h2{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--gold)}
+.login-card p{font-size:12px;color:var(--muted);margin-bottom:16px}
+.login-card input{width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;font-family:var(--font);margin-bottom:8px}
+.login-card .btn{width:100%}
+
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600}
+.tag.live{background:#0a2010;color:var(--green)}
+.tag.practice-t{background:#001a18;color:var(--cyan);border:1px solid var(--cyan)}
+.tag.ended{background:var(--bg3);color:var(--muted)}
+.notice{padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:10px;display:none;border:1px solid}
+.notice.info{background:#080d18;color:var(--blue);border-color:var(--blue)}
+.notice.success{background:#081408;color:var(--green);border-color:var(--green)}
+.notice.warn{background:#180d00;color:#fbbf24;border-color:#fbbf24}
+.section-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+</style>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="8" height="8" rx="1.5" fill="#fff" opacity=".9"/>
+        <rect x="13" y="3" width="8" height="8" rx="1.5" fill="#fff" opacity=".5"/>
+        <rect x="3" y="13" width="8" height="8" rx="1.5" fill="#fff" opacity=".5"/>
+        <rect x="13" y="13" width="8" height="8" rx="1.5" fill="#fff" opacity=".9"/>
+      </svg>
+    </div>
+    <div><div class="logo-text">ARENA</div><div class="logo-sub">by Ilai</div></div>
+  </div>
+  <nav class="nav">
+    <button class="nb active" onclick="showPage('home')">Home</button>
+    <button class="nb" onclick="showPage('watch')">Watch</button>
+    <button class="nb" onclick="showPage('stats')">Stats</button>
+    <button class="nb" id="settingsNavBtn" onclick="showPage('settings')" style="display:none">Settings</button>
+    <button class="nb" id="adminNavBtn" onclick="showPage('admin')" style="display:none">Admin <span class="badge">ADMIN</span></button>
+    <button class="nb" id="loginBtn" onclick="showPage('login')">Login</button>
+  </nav>
+</div>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div id="liveAlert" style="display:none;background:#0a2010;border:1px solid var(--green);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;display:none;align-items:center;gap:8px">
+    <span class="live-dot"></span><span>A battle is currently live!</span>
+    <button class="btn" style="margin-left:auto;padding:4px 10px" onclick="showPage('watch')">Watch now</button>
+  </div>
+  <div class="home-grid">
+    <div class="stat-big gold-accent"><div class="num" id="hTotalGames" style="color:var(--gold)">0</div><div class="lbl">Total Games</div></div>
+    <div class="stat-big red-accent"><div class="num" id="hTotalKills" style="color:var(--red)">0</div><div class="lbl">Total Kills</div></div>
+    <div class="stat-big blue-accent"><div class="num" id="hTotalPlayers" style="color:var(--blue)">0</div><div class="lbl">Unique Players</div></div>
+  </div>
+  <div class="last-game-banner" id="lastGameBanner" style="display:none">
+    <div class="last-game-title">⚔ Last Game Results</div>
+    <div class="podium-row" id="lastGamePodium"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap" id="lastGameMeta"></div>
+  </div>
+  <div class="section-title">Recent Games</div>
+  <div class="recent-games" id="recentGames"><p style="color:var(--muted);font-size:12px">No games yet. Start one!</p></div>
+</div>
+
+<!-- WATCH -->
+<div id="page-watch" class="page">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+    <div style="font-size:15px;font-weight:700">Live Arena</div>
+    <span class="tag ended" id="gameStatusTag">No active game</span>
+    <span id="gameIdLabel" style="font-size:11px;color:var(--muted)"></span>
+    <div id="adminGameBtns" style="display:none;gap:6px;margin-left:auto;flex-wrap:wrap">
+      <button class="btn gold" onclick="startGame(false)">▶ Start Battle</button>
+      <button class="btn cyan" onclick="startGame(true)">⚙ Practice</button>
+      <button class="btn red" onclick="endGame()">■ End</button>
+    </div>
+  </div>
+  <div class="watch-layout">
+    <div>
+      <div class="arena-outer">
+        <canvas id="arenaCanvas"></canvas>
+        <div class="kill-feed" id="killFeedEl"></div>
+      </div>
+      <div class="arena-bar">
+        <div class="chip">Alive: <span id="statAlive">0</span></div>
+        <div class="chip">Time: <span id="statTime">0s</span></div>
+        <div class="chip">Kills: <span id="statKills">0</span></div>
+      </div>
+      <div id="watchLB" style="margin-top:10px"></div>
+    </div>
+    <div class="watch-sidebar" id="watchSidebar"></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="page-stats" class="page">
+  <div class="search-banner">
+    <h2>🔍 Find Your Stats</h2>
+    <p>Enter your YouTube name to see all your battle history.</p>
+    <div class="search-row">
+      <input type="text" id="playerNameInput" placeholder="Your YouTube name...">
+      <button class="btn blue" onclick="searchPlayer()">Search</button>
+    </div>
+    <div class="player-result-card" id="playerResultCard">
+      <div class="pname" id="pResultName"></div>
+      <div class="player-stat-grid" id="pStatGrid"></div>
+      <div class="recent-title">Recent Games</div>
+      <div id="pRecentGames"></div>
+    </div>
+  </div>
+  <div class="game-select-row" style="margin-top:14px">
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Select Game</div>
+      <select id="gameSelect" onchange="loadGameStats()"></select>
+    </div>
+  </div>
+  <div id="statsContent"><p style="color:var(--muted);font-size:12px">Select a game above.</p></div>
+</div>
+
+<!-- SETTINGS (admin only) -->
+<div id="page-settings" class="page" style="display:none">
+  <div class="section-title">⚙ Game Settings</div>
+  <div class="notice" id="settingsNotice"></div>
+  <div class="settings-grid">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--blue)"></span>Physics</div>
+      <div class="range-row"><label>Player Speed</label><input type="range" id="setSpeed" min="0.5" max="4" step="0.1" value="1.6" oninput="document.getElementById('setSpeedVal').textContent=parseFloat(this.value).toFixed(1)"><span class="val" id="setSpeedVal">1.6</span></div>
+      <div class="range-row"><label>Damage / Hit</label><input type="range" id="setDmg" min="1" max="20" step="1" value="5" oninput="document.getElementById('setDmgVal').textContent=this.value"><span class="val" id="setDmgVal">5</span></div>
+      <div class="range-row"><label>Max HP</label><input type="range" id="setHP" min="20" max="200" step="5" value="60" oninput="document.getElementById('setHPVal').textContent=this.value"><span class="val" id="setHPVal">60</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--gold)"></span>Kill Reward</div>
+      <div class="kill-reward-row">
+        <label>+1 HP per kill (every kill restores one hit worth of health)</label>
+        <div class="toggle" id="killRewardToggle" onclick="toggleKillReward()"></div>
+      </div>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <div class="card-title"><span class="dot" style="background:var(--purple)"></span>Superpowers — assign to players by name</div>
+      <div class="power-cards">
+        <div class="power-card" style="border-color:#5599e030">
+          <div class="power-header"><span class="icon">🔫</span><div><div class="name" style="color:var(--blue)">Gun</div><div class="desc">A rotating cannon fires 3 random shots at nearby enemies</div></div></div>
+          <div class="power-target"><label>Assign to:</label><input type="text" id="powerGunTarget" placeholder="Player name (leave blank for none)..."></div>
+        </div>
+        <div class="power-card" style="border-color:#4ade8030">
+          <div class="power-header"><span class="icon">💚</span><div><div class="name" style="color:var(--green)">Double Life</div><div class="desc">After dying, revive once with 50% HP</div></div></div>
+          <div class="power-target"><label>Assign to:</label><input type="text" id="powerReviveTarget" placeholder="Player name..."></div>
+        </div>
+        <div class="power-card" style="border-color:#c084fc30">
+          <div class="power-header"><span class="icon">🛡</span><div><div class="name" style="color:var(--purple)">Shield</div><div class="desc">5 seconds of full damage protection at game start</div></div></div>
+          <div class="power-target"><label>Assign to:</label><input type="text" id="powerShieldTarget" placeholder="Player name..."></div>
+        </div>
+      </div>
+      <button class="btn gold" style="margin-top:10px;width:100%" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="page-admin" class="page" style="display:none">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+    <div style="font-size:15px;font-weight:700">Admin Panel</div>
+    <span class="badge">ADMIN</span>
+  </div>
+  <div class="notice" id="adminNotice"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--cyan)"></span>YouTube Channel</div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:10px;margin-bottom:8px">
+        <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5">Connect your YouTube channel. In the hosted version, this uses real YouTube OAuth. Here it simulates the connection.</p>
+        <button class="btn" onclick="mockGoogleLogin()" id="googleLoginBtn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:7px">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Sign in with Google
+        </button>
+        <div style="font-size:10px;padding:4px 8px;border-radius:4px;margin-top:5px;background:var(--bg3);color:var(--muted)" id="ytStatus">Not connected</div>
+      </div>
+      <div id="ytSection" style="display:none">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:5px">Subscribers:</div>
+        <div id="ytSubItems"></div>
+        <button class="btn" style="margin-top:6px;width:100%;font-size:11px" onclick="addAllSubs()">Add all to next game</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Next Game Roster (<span id="adminPCount">0</span>)</div>
+      <div class="adm-participant-list" id="adminPList"></div>
+      <div class="add-row"><input type="text" id="newP" placeholder="Add real player..." onkeydown="if(event.key==='Enter')addParticipant()"><button class="btn" onclick="addParticipant()">+</button></div>
+      <div style="margin-top:7px">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Quick-add bots:</div>
+        <div class="bot-grid" id="adminBotGrid"></div>
+        <div class="add-row" style="margin-top:4px">
+          <input type="text" id="customBot" placeholder="Custom bot name...">
+          <button class="btn purple" onclick="addCustomBot()">+ Bot</button>
+        </div>
+      </div>
+      <div class="game-btns">
+        <button class="btn gold" onclick="startGame(false)">▶ Start</button>
+        <button class="btn cyan" onclick="startGame(true)">⚙ Practice</button>
+        <button class="btn red" onclick="endGame()">■ End</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--red)"></span>History</div>
+      <div id="adminHistory"><p style="color:var(--muted);font-size:12px">No games yet.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="page-login" class="page" style="display:none">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div style="font-size:22px;margin-bottom:8px">⚔</div>
+      <h2>Admin Access</h2>
+      <p>Enter your password to manage games.</p>
+      <input type="password" id="adminPass" placeholder="Password" onkeydown="if(event.key==='Enter')tryLogin()">
+      <button class="btn gold" onclick="tryLogin()">Enter Arena</button>
+      <p style="font-size:10px;color:var(--muted);margin-top:10px">Default: <code>ilai2024</code></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PASS='ilai2024';
+const COLORS=['#e5c46a','#e05555','#5599e0','#4ade80','#c084fc','#e09a55','#55bbe0','#e055b0','#a0e055','#55e0a0','#e0d055','#b055e0'];
+const BOT_NAMES=['BotAlpha','BotBeta','BotGamma','BotDelta','BotEpsilon','BotZeta','BotEta','BotSigma'];
+let isAdmin=false,gameRunning=false,isPractice=false;
+let gameInterval=null,animFrame=null,gameTime=0,totalElims=0,currentGameId=null;
+let fighters=[],killFeed=[],bullets=[];
+let games=JSON.parse(localStorage.getItem('arenaG4')||'[]');
+let participants=JSON.parse(localStorage.getItem('arenaP4')||'[]');
+let ytSubs=[];
+
+// Settings
+let settings={speed:1.6,dmg:5,maxHP:60,killReward:false,powers:{gun:'',revive:'',shield:''}};
+
+function saveP(){localStorage.setItem('arenaG4',JSON.stringify(games));localStorage.setItem('arenaP4',JSON.stringify(participants));}
+
+/* ── PAGES ── */
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>{el.classList.remove('active');el.style.display='none'});
+  document.querySelectorAll('.nb').forEach(el=>el.classList.remove('active'));
+  const pg=document.getElementById('page-'+p);
+  if(pg){pg.style.display='block';pg.classList.add('active');}
+  const nb=document.querySelector(`.nb[onclick="showPage('${p}')"]`);
+  if(nb)nb.classList.add('active');
+  if(p==='home')renderHome();
+  if(p==='stats'){loadSelectOptions();renderHome();}
+  if(p==='admin'&&isAdmin)renderAdmin();
+  if(p==='watch')renderWatchSidebar();
+}
+
+/* ── LOGIN ── */
+function tryLogin(){
+  if(document.getElementById('adminPass').value===ADMIN_PASS){
+    isAdmin=true;
+    document.getElementById('adminNavBtn').style.display='inline-flex';
+    document.getElementById('settingsNavBtn').style.display='inline-flex';
+    document.getElementById('loginBtn').style.display='none';
+    document.getElementById('adminGameBtns').style.display='flex';
+    showPage('admin');
+  } else {
+    const i=document.getElementById('adminPass');i.value='';i.placeholder='Wrong password!';
+    setTimeout(()=>i.placeholder='Password',1500);
+  }
+}
+
+/* ── HOME ── */
+function renderHome(){
+  const visible=isAdmin?games:games.filter(g=>!g.practice);
+  const allKills=visible.reduce((s,g)=>s+g.results.reduce((a,r)=>a+r.kills,0),0);
+  const allPlayers=new Set(visible.flatMap(g=>g.results.map(r=>r.name))).size;
+  document.getElementById('hTotalGames').textContent=visible.length;
+  document.getElementById('hTotalKills').textContent=allKills;
+  document.getElementById('hTotalPlayers').textContent=allPlayers;
+  const last=visible[visible.length-1];
+  const lb=document.getElementById('lastGameBanner');
+  if(last){
+    lb.style.display='block';
+    const medals=['🥇','🥈','🥉'];
+    document.getElementById('lastGamePodium').innerHTML=last.results.slice(0,3).map((r,i)=>`
+      <div class="podium-item ${['first','second','third'][i]}">
+        <div class="podium-medal">${medals[i]}</div>
+        <div class="podium-info"><div class="podium-name">${r.name}</div><div class="podium-sub">${r.kills} kills · ${r.survivalTime}s</div></div>
+      </div>`).join('');
+    document.getElementById('lastGameMeta').innerHTML=`
+      <div style="font-size:11px;color:var(--muted);padding:4px 8px;background:var(--bg2);border-radius:4px;border:1px solid var(--border)">Game #${last.id}</div>
+      <div style="font-size:11px;color:var(--muted);padding:4px 8px;background:var(--bg2);border-radius:4px;border:1px solid var(--border)">${last.date}</div>
+      <div style="font-size:11px;color:var(--muted);padding:4px 8px;background:var(--bg2);border-radius:4px;border:1px solid var(--border)">${last.participants} fighters</div>
+      <div style="font-size:11px;color:var(--muted);padding:4px 8px;background:var(--bg2);border-radius:4px;border:1px solid var(--border)">${last.duration}s duration</div>`;
+  } else lb.style.display='none';
+  const rg=document.getElementById('recentGames');
+  if(!visible.length){rg.innerHTML='<p style="color:var(--muted);font-size:12px">No games yet. Start one!</p>';return;}
+  rg.innerHTML=[...visible].reverse().slice(0,8).map(g=>`
+    <div class="game-row" onclick="goToGame(${g.id})">
+      <span class="gn">Game #${g.id}${g.practice?'<span class="tag practice-t" style="margin-left:4px">P</span>':''}</span>
+      <span class="gw">🏆 ${g.results[0]?.name||'—'} · ${g.results[0]?.kills||0} kills</span>
+      <span style="font-size:11px;color:var(--muted)">${g.participants} fighters</span>
+      <span class="gd">${g.date}</span>
+    </div>`).join('');
+}
+function goToGame(id){
+  showPage('stats');
+  setTimeout(()=>{document.getElementById('gameSelect').value=id;loadGameStats();},100);
+}
+
+/* ── SETTINGS ── */
+function toggleKillReward(){
+  settings.killReward=!settings.killReward;
+  const t=document.getElementById('killRewardToggle');
+  t.classList.toggle('on',settings.killReward);
+}
+function saveSettings(){
+  settings.speed=parseFloat(document.getElementById('setSpeed').value);
+  settings.dmg=parseInt(document.getElementById('setDmg').value);
+  settings.maxHP=parseInt(document.getElementById('setHP').value);
+  settings.powers.gun=document.getElementById('powerGunTarget').value.trim();
+  settings.powers.revive=document.getElementById('powerReviveTarget').value.trim();
+  settings.powers.shield=document.getElementById('powerShieldTarget').value.trim();
+  showNotice('settingsNotice','Settings saved!','success');
+}
+function showNotice(id,msg,type){
+  const el=document.getElementById(id);if(!el)return;
+  el.textContent=msg;el.className='notice '+type;el.style.display='block';
+  setTimeout(()=>el.style.display='none',3000);
+}
+
+/* ── ADMIN ── */
+function renderAdmin(){
+  renderAdminList();
+  document.getElementById('adminBotGrid').innerHTML=BOT_NAMES.map(b=>`<div class="bot-btn" onclick="addBot('${b}')">${b}</div>`).join('');
+  renderHistory();
+}
+function renderAdminList(){
+  const list=document.getElementById('adminPList');
+  document.getElementById('adminPCount').textContent=participants.length;
+  list.innerHTML=participants.map((p,i)=>`
+    <div class="p-item">
+      <div class="p-avatar" style="background:${COLORS[i%COLORS.length]}22;color:${COLORS[i%COLORS.length]};border-color:${COLORS[i%COLORS.length]}44">${p.thumb?`<img src="${p.thumb}">`:(p.name.slice(0,2).toUpperCase())}</div>
+      <span class="p-name">${p.name}</span>
+      ${getPowerBadge(p.name)}
+      <span class="p-type-tag ${p.type==='bot'?'bot':'yt'}">${p.type==='bot'?'BOT':'YT'}</span>
+      <span class="p-remove" onclick="removeP(${i})">×</span>
+    </div>`).join('');
+  renderWatchSidebar();
+}
+function getPowerBadge(name){
+  let b='';
+  if(settings.powers.gun===name) b+='<span class="power-icon" title="Gun">🔫</span>';
+  if(settings.powers.revive===name) b+='<span class="power-icon" title="Double Life">💚</span>';
+  if(settings.powers.shield===name) b+='<span class="power-icon" title="Shield">🛡</span>';
+  return b;
+}
+function renderWatchSidebar(){
+  const sb=document.getElementById('watchSidebar');
+  if(!isAdmin){sb.innerHTML='';return;}
+  const alive=fighters.filter(f=>f.alive).length;
+  sb.innerHTML=`<div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--green)"></span>Roster (${participants.length})</div>
+    <div style="display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto">
+      ${gameRunning?fighters.map((f,i)=>`
+        <div class="p-item ${f.alive?'alive':'dead'}">
+          <div class="p-avatar" style="background:${f.color}22;color:${f.color}">${f.name.slice(0,2).toUpperCase()}</div>
+          <span class="p-name">${f.name}</span>
+          <span class="p-hp">${Math.max(0,Math.round(f.hp))}hp</span>
+          <span class="p-type-tag ${f.type==='bot'?'bot':'yt'}">${f.type==='bot'?'B':'Y'}</span>
+        </div>`).join('')
+      :participants.map((p,i)=>`
+        <div class="p-item">
+          <div class="p-avatar" style="background:${COLORS[i%COLORS.length]}22;color:${COLORS[i%COLORS.length]}">${p.thumb?`<img src="${p.thumb}">`:(p.name.slice(0,2).toUpperCase())}</div>
+          <span class="p-name">${p.name}</span>
+          ${getPowerBadge(p.name)}
+          <span class="p-type-tag ${p.type==='bot'?'bot':'yt'}">${p.type==='bot'?'BOT':'YT'}</span>
+        </div>`).join('')}
+    </div>
+    ${isAdmin&&!gameRunning?`<div class="add-row" style="margin-top:6px"><input type="text" id="sbNewP" placeholder="Add player..." onkeydown="if(event.key==='Enter'){if(!participants.find(p=>p.name===this.value.trim()))participants.push({name:this.value.trim(),type:'real'});this.value='';saveP();renderAdminList();}"><button class="btn" style="padding:4px 8px" onclick="const v=document.getElementById('sbNewP').value.trim();if(v&&!participants.find(p=>p.name===v)){participants.push({name:v,type:'real'});document.getElementById('sbNewP').value='';saveP();renderAdminList();}">+</button></div>`:''}
+  </div>`;
+}
+function renderHistory(){
+  const el=document.getElementById('adminHistory');
+  if(!games.length){el.innerHTML='<p style="color:var(--muted);font-size:12px">No games yet.</p>';return;}
+  el.innerHTML=`<div style="display:flex;flex-direction:column;gap:4px">${[...games].reverse().slice(0,8).map(g=>`
+    <div style="display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px">
+      <span style="font-weight:700;color:var(--gold);min-width:50px">#${g.id}${g.practice?'<span style="font-size:9px;margin-left:3px;color:var(--cyan)">P</span>':''}</span>
+      <span style="flex:1;color:var(--muted)">🏆 ${g.results[0]?.name||'—'}</span>
+      <span style="font-size:10px;color:var(--muted)">${g.date}</span>
+    </div>`).join('')}</div>`;
+}
+
+function addParticipant(){
+  const v=document.getElementById('newP').value.trim();if(!v)return;
+  if(!participants.find(p=>p.name===v))participants.push({name:v,type:'real'});
+  document.getElementById('newP').value='';saveP();renderAdminList();
+}
+function addBot(name){
+  let n=name,c=1;while(participants.find(p=>p.name===n))n=name+(c++);
+  participants.push({name:n,type:'bot'});saveP();renderAdminList();
+}
+function addCustomBot(){
+  const v=document.getElementById('customBot').value.trim()||'Bot'+Math.floor(Math.random()*999);
+  let n=v,c=1;while(participants.find(p=>p.name===n))n=v+(c++);
+  participants.push({name:n,type:'bot'});document.getElementById('customBot').value='';saveP();renderAdminList();
+}
+function removeP(i){participants.splice(i,1);saveP();renderAdminList();}
+
+/* ── YOUTUBE ── */
+function mockGoogleLogin(){
+  const email=prompt('Enter your Google email connected to YouTube:');
+  if(!email)return;
+  document.getElementById('ytStatus').textContent='Connected: '+email;
+  document.getElementById('ytStatus').style.color='var(--green)';
+  document.getElementById('googleLoginBtn').style.display='none';
+  ytSubs=[{name:'YourRealSub',thumb:null}];
+  document.getElementById('ytSection').style.display='block';
+  document.getElementById('ytSubItems').innerHTML=ytSubs.map(s=>`
+    <div class="p-item" style="margin-bottom:4px">
+      <div class="p-avatar" style="background:#0a2010;color:var(--green)">${s.name.slice(0,2).toUpperCase()}</div>
+      <span class="p-name">${s.name}</span>
+      <span class="p-type-tag yt">YT</span>
+      <button class="btn" style="padding:2px 7px;font-size:10px" onclick="addYTSub('${s.name}')">Add</button>
+    </div>`).join('');
+  showNotice('adminNotice','Connected! 1 subscriber found.','success');
+}
+function addYTSub(name){
+  if(!participants.find(p=>p.name===name))participants.push({name,type:'real',thumb:null});
+  saveP();renderAdminList();showNotice('adminNotice',name+' added!','success');
+}
+function addAllSubs(){
+  ytSubs.forEach(s=>{if(!participants.find(p=>p.name===s.name))participants.push({name:s.name,type:'real',thumb:null});});
+  saveP();renderAdminList();showNotice('adminNotice','All subscribers added!','success');
+}
+
+/* ══════════════════════════════
+        GAME ENGINE
+══════════════════════════════ */
+const PAD=28,CANVAS_SIZE=520;
+function getFighterR(){
+  const n=fighters.length||participants.length;
+  if(n<=3) return 26;
+  if(n<=5) return 22;
+  if(n<=8) return 19;
+  return 16;
+}
+
+function startGame(practice){
+  if(gameRunning){showNotice('adminNotice','Game already running!','warn');return;}
+  if(participants.length<2){showNotice('adminNotice','Need at least 2!','warn');return;}
+  isPractice=practice;gameRunning=true;gameTime=0;totalElims=0;killFeed=[];bullets=[];
+  currentGameId=games.length+1;
+  const tag=document.getElementById('gameStatusTag');
+  if(practice){tag.textContent='PRACTICE';tag.className='tag practice-t';}
+  else{tag.textContent='LIVE';tag.className='tag live';}
+  document.getElementById('gameIdLabel').textContent=`Game #${currentGameId}${practice?' · practice':''}`;
+  const canvas=document.getElementById('arenaCanvas');
+  canvas.width=CANVAS_SIZE;canvas.height=CANVAS_SIZE;
+  initFighters();
+  gameInterval=setInterval(()=>{gameTime++;document.getElementById('statTime').textContent=gameTime+'s';},1000);
+  showPage('watch');
+  requestAnimationFrame(runLoop);
+}
+
+function endGame(){
+  if(!gameRunning){showNotice('adminNotice','No game running.','warn');return;}
+  gameRunning=false;
+  if(gameInterval){clearInterval(gameInterval);gameInterval=null;}
+  if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
+  document.getElementById('gameStatusTag').textContent='Ended';
+  document.getElementById('gameStatusTag').className='tag ended';
+  saveResults();renderLB();renderWatchSidebar();
+}
+
+function initFighters(){
+  const R=getFighterR();
+  const n=participants.length;
+  const spd=settings.speed*(n>10?0.7:n>6?0.85:1);
+  fighters=participants.map((p,i)=>{
+    const angle=(i/n)*Math.PI*2+Math.random()*0.3;
+    const s=spd*(0.8+Math.random()*0.4);
+    const hasGun=settings.powers.gun===p.name;
+    const hasRevive=settings.powers.revive===p.name;
+    const hasShield=settings.powers.shield===p.name;
+    return {
+      name:p.name,type:p.type,color:COLORS[i%COLORS.length],thumb:p.thumb||null,
+      x:PAD+R+Math.random()*(CANVAS_SIZE-2*(PAD+R)),
+      y:PAD+R+Math.random()*(CANVAS_SIZE-2*(PAD+R)),
+      vx:Math.cos(angle)*s,vy:Math.sin(angle)*s,
+      hp:settings.maxHP,maxHP:settings.maxHP,alive:true,kills:0,
+      survivalTime:0,killedBy:null,flashTimer:0,
+      // powers
+      hasGun,gunAngle:0,gunCooldown:0,gunAmmo:3,
+      hasRevive,revived:false,
+      hasShield,shieldTimer:hasShield?300:0, // 5s @ 60fps
+    };
+  });
+}
+
+/* ── PHYSICS ── */
+function updateFighters(){
+  const R=getFighterR();
+  const minX=PAD+R,maxX=CANVAS_SIZE-PAD-R,minY=PAD+R,maxY=CANVAS_SIZE-PAD-R;
+  const alive=fighters.filter(f=>f.alive);
+
+  alive.forEach(f=>{
+    f.x+=f.vx;f.y+=f.vy;
+    // straight-line wall bounce
+    if(f.x<=minX){f.x=minX;f.vx=Math.abs(f.vx);}
+    if(f.x>=maxX){f.x=maxX;f.vx=-Math.abs(f.vx);}
+    if(f.y<=minY){f.y=minY;f.vy=Math.abs(f.vy);}
+    if(f.y>=maxY){f.y=maxY;f.vy=-Math.abs(f.vy);}
+    if(f.flashTimer>0)f.flashTimer--;
+    if(f.shieldTimer>0)f.shieldTimer--;
+    f.survivalTime=gameTime;
+    // gun rotation + fire
+    if(f.hasGun&&f.gunAmmo>0){
+      f.gunAngle+=0.04;
+      f.gunCooldown--;
+      if(f.gunCooldown<=0&&f.gunAmmo>0){
+        // find nearest enemy
+        const targets=alive.filter(e=>e!==f);
+        if(targets.length){
+          const t=targets[Math.floor(Math.random()*targets.length)];
+          const dx=t.x-f.x,dy=t.y-f.y;
+          const d=Math.sqrt(dx*dx+dy*dy)||1;
+          bullets.push({x:f.x,y:f.y,vx:(dx/d)*4.5,vy:(dy/d)*4.5,owner:f,life:120,color:f.color});
+          f.gunAmmo--;f.gunCooldown=60;
+        }
+      }
+    }
+  });
+
+  // bullets
+  bullets=bullets.filter(b=>{
+    b.x+=b.vx;b.y+=b.vy;b.life--;
+    if(b.x<PAD||b.x>CANVAS_SIZE-PAD||b.y<PAD||b.y>CANVAS_SIZE-PAD)return false;
+    if(b.life<=0)return false;
+    const R2=getFighterR();
+    for(const f of fighters){
+      if(!f.alive||f===b.owner)continue;
+      if(f.shieldTimer>0)continue;
+      const dx=f.x-b.x,dy=f.y-b.y;
+      if(dx*dx+dy*dy<R2*R2){
+        f.hp-=settings.dmg*1.5;f.flashTimer=8;
+        if(f.hp<=0&&f.alive){
+          if(f.hasRevive&&!f.revived){
+            f.hp=f.maxHP*0.5;f.revived=true;
+            addKF('💚 '+f.name+' revived!');
+          } else {
+            f.alive=false;f.killedBy=b.owner.name;b.owner.kills++;totalElims++;
+            if(settings.killReward)b.owner.hp=Math.min(b.owner.maxHP,b.owner.hp+settings.dmg);
+            addKF(b.owner.name+' eliminated '+f.name+' 🔫');
+          }
+        }
+        return false;
+      }
+    }
+    return true;
+  });
+
+  // fighter collisions
+  for(let i=0;i<alive.length;i++){
+    for(let j=i+1;j<alive.length;j++){
+      const a=alive[i],b=alive[j];
+      const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+      const R2=getFighterR()*2;
+      if(d<R2&&d>0.1){
+        const nx=dx/d,ny=dy/d;
+        const ov=(R2-d)/2+0.5;
+        a.x+=nx*ov;a.y+=ny*ov;b.x-=nx*ov;b.y-=ny*ov;
+        const dv=a.vx-b.vx,dvY=a.vy-b.vy,dot=dv*nx+dvY*ny;
+        if(dot<0){a.vx-=dot*nx;a.vy-=dot*ny;b.vx+=dot*nx;b.vy+=dot*ny;}
+        const shA=a.shieldTimer>0,shB=b.shieldTimer>0;
+        if(!shA){a.hp-=settings.dmg;a.flashTimer=10;}
+        if(!shB){b.hp-=settings.dmg;b.flashTimer=10;}
+        const checkDeath=(f,killer)=>{
+          if(f.hp<=0&&f.alive){
+            if(f.hasRevive&&!f.revived){f.hp=f.maxHP*0.5;f.revived=true;addKF('💚 '+f.name+' revived!');}
+            else{
+              f.alive=false;f.killedBy=killer.name;killer.kills++;totalElims++;
+              if(settings.killReward)killer.hp=Math.min(killer.maxHP,killer.hp+settings.dmg);
+              addKF(killer.name+' eliminated '+f.name);
+            }
+          }
+        };
+        checkDeath(a,b);checkDeath(b,a);
+      }
+    }
+  }
+}
+
+/* ── DRAW ── */
+function draw(){
+  const canvas=document.getElementById('arenaCanvas');
+  const ctx=canvas.getContext('2d');
+  const S=CANVAS_SIZE;
+  ctx.clearRect(0,0,S,S);
+  ctx.fillStyle='#050508';ctx.fillRect(0,0,S,S);
+  // grid
+  ctx.strokeStyle='#101018';ctx.lineWidth=.5;
+  for(let x=PAD;x<S-PAD;x+=48){ctx.beginPath();ctx.moveTo(x,PAD);ctx.lineTo(x,S-PAD);ctx.stroke();}
+  for(let y=PAD;y<S-PAD;y+=48){ctx.beginPath();ctx.moveTo(PAD,y);ctx.lineTo(S-PAD,y);ctx.stroke();}
+  // border gradient
+  const grad=ctx.createLinearGradient(PAD,PAD,S-PAD,S-PAD);
+  grad.addColorStop(0,'#e05555');grad.addColorStop(1,'#5599e0');
+  ctx.strokeStyle=grad;ctx.lineWidth=1.5;
+  ctx.strokeRect(PAD,PAD,S-PAD*2,S-PAD*2);
+
+  const R=getFighterR();
+  // bullets
+  bullets.forEach(b=>{
+    ctx.beginPath();ctx.arc(b.x,b.y,3.5,0,Math.PI*2);
+    ctx.fillStyle=b.color;ctx.fill();
+    ctx.beginPath();ctx.arc(b.x,b.y,5,0,Math.PI*2);
+    ctx.fillStyle=b.color+'44';ctx.fill();
+  });
+
+  // fighters
+  fighters.forEach(f=>{
+    if(!f.alive)return;
+    const flash=f.flashTimer>0&&Math.floor(f.flashTimer/2)%2===0;
+    const shielded=f.shieldTimer>0;
+    // shield aura
+    if(shielded){
+      ctx.beginPath();ctx.arc(f.x,f.y,R+5,0,Math.PI*2);
+      ctx.strokeStyle='#c084fc';ctx.lineWidth=2;
+      ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+    }
+    // body
+    ctx.beginPath();ctx.arc(f.x,f.y,R,0,Math.PI*2);
+    ctx.fillStyle=flash?'#ffffff18':f.color+'1a';ctx.fill();
+    ctx.strokeStyle=flash?'#fff':f.color;ctx.lineWidth=shielded?2.5:1.8;ctx.stroke();
+    // initials
+    ctx.fillStyle=flash?'#fff':f.color;
+    ctx.font=`bold ${Math.max(9,R-8)}px monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(f.name.slice(0,2).toUpperCase(),f.x,f.y);
+    // gun arm
+    if(f.hasGun&&f.gunAmmo>0){
+      const gx=f.x+Math.cos(f.gunAngle)*(R+4),gy=f.y+Math.sin(f.gunAngle)*(R+4);
+      ctx.beginPath();ctx.arc(gx,gy,3,0,Math.PI*2);
+      ctx.fillStyle='#5599e0';ctx.fill();
+    }
+    // name + type
+    const lbl=(f.name.length>8?f.name.slice(0,8)+'…':f.name)+(f.type==='bot'?' ·B':'');
+    ctx.font=`${Math.max(8,R-10)}px sans-serif`;ctx.fillStyle='#ffffff44';
+    ctx.fillText(lbl,f.x,f.y+R+8);
+    // HP bar
+    const hpPct=Math.max(0,f.hp)/f.maxHP;
+    const bw=R*2+6;
+    ctx.fillStyle='#1a1a2a';
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(f.x-bw/2,f.y-R-10,bw,4,2);ctx.fill();}
+    else ctx.fillRect(f.x-bw/2,f.y-R-10,bw,4);
+    ctx.fillStyle=hpPct>0.5?'#4ade80':hpPct>0.25?'#facc15':'#e05555';
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(f.x-bw/2,f.y-R-10,bw*hpPct,4,2);ctx.fill();}
+    else ctx.fillRect(f.x-bw/2,f.y-R-10,bw*hpPct,4);
+  });
+  ctx.globalAlpha=1;
+}
+
+/* ── LOOP ── */
+function runLoop(){
+  if(!gameRunning)return;
+  updateFighters();draw();
+  document.getElementById('statAlive').textContent=fighters.filter(f=>f.alive).length;
+  document.getElementById('statKills').textContent=totalElims;
+  killFeed.forEach(k=>k.t--);killFeed=killFeed.filter(k=>k.t>0);
+  if(isAdmin)renderWatchSidebar();
+  if(fighters.filter(f=>f.alive).length<=1){
+    setTimeout(()=>{
+      gameRunning=false;
+      if(gameInterval){clearInterval(gameInterval);gameInterval=null;}
+      document.getElementById('gameStatusTag').textContent='Ended';
+      document.getElementById('gameStatusTag').className='tag ended';
+      saveResults();renderLB();renderWatchSidebar();
+    },1200);return;
+  }
+  animFrame=requestAnimationFrame(runLoop);
+}
+
+/* ── KILL FEED ── */
+function addKF(msg){
+  killFeed.unshift({msg,t:320});if(killFeed.length>5)killFeed.pop();
+  document.getElementById('killFeedEl').innerHTML=killFeed.slice(0,5).map(k=>`<div class="ke">${k.msg}</div>`).join('');
+}
+
+/* ── SAVE ── */
+function saveResults(){
+  const al=fighters.filter(f=>f.alive).sort((a,b)=>b.kills-a.kills);
+  const de=fighters.filter(f=>!f.alive).sort((a,b)=>b.survivalTime-a.survivalTime);
+  const sorted=[...al,...de];
+  games.push({
+    id:currentGameId,practice:isPractice,
+    date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
+    duration:gameTime,participants:participants.length,
+    results:sorted.map((f,i)=>({rank:i+1,name:f.name,type:f.type,kills:f.kills,survivalTime:f.survivalTime||gameTime,killedBy:f.killedBy||null}))
+  });
+  saveP();loadSelectOptions();if(isAdmin)renderAdmin();renderHome();
+}
+
+/* ── LEADERBOARD ── */
+function renderLB(){
+  const last=games[games.length-1];if(!last)return;
+  if(last.practice&&!isAdmin)return;
+  const el=document.getElementById('watchLB');
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:8px">Game #${last.id} Results${last.practice?'<span class="tag practice-t" style="margin-left:6px">PRACTICE</span>':''}</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">${last.results.slice(0,3).map((r,i)=>`
+    <div class="podium-item ${['first','second','third'][i]}" style="min-width:110px">
+      <div class="podium-medal">${medals[i]}</div>
+      <div class="podium-info"><div class="podium-name">${r.name}</div><div class="podium-sub">${r.kills} kills · ${r.survivalTime}s</div></div>
+    </div>`).join('')}</div>`;
+}
+
+/* ── STATS PAGE ── */
+function loadSelectOptions(){
+  const sel=document.getElementById('gameSelect');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— Select a game —</option>';
+  const vis=isAdmin?games:games.filter(g=>!g.practice);
+  vis.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=`Game #${g.id}${g.practice?' (practice)':''} — ${g.date}`;sel.appendChild(o);});
+  if(cur)sel.value=cur;else if(vis.length){sel.value=vis[vis.length-1].id;loadGameStats();}
+}
+function loadGameStats(){
+  const id=document.getElementById('gameSelect').value;
+  if(!id){document.getElementById('statsContent').innerHTML='<p style="color:var(--muted);font-size:12px">Select a game above.</p>';return;}
+  const game=games.find(g=>g.id==id);if(!game)return;
+  const medals=['🥇','🥈','🥉'];
+  const topK=[...game.results].sort((a,b)=>b.kills-a.kills)[0];
+  const topS=[...game.results].sort((a,b)=>b.survivalTime-a.survivalTime)[0];
+  document.getElementById('statsContent').innerHTML=`
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <div class="podium-item first"><div class="podium-medal">🏆</div><div class="podium-info"><div class="podium-sub" style="font-size:10px">Most kills</div><div class="podium-name">${topK.name} (${topK.kills})</div></div></div>
+    <div class="podium-item second"><div class="podium-medal">⏱</div><div class="podium-info"><div class="podium-sub" style="font-size:10px">Longest survival</div><div class="podium-name">${topS.name} (${topS.survivalTime}s)</div></div></div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+  <table class="full-table"><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Kills</th><th>Time</th><th>Eliminated by</th></tr></thead>
+  <tbody>${game.results.map((r,i)=>`<tr>
+    <td style="font-weight:700;color:var(--gold)">${medals[i]||('#'+r.rank)}</td>
+    <td style="font-weight:600">${r.name}</td>
+    <td><span style="font-size:10px;padding:1px 6px;border-radius:4px;background:${r.type==='bot'?'#180a2a':'#081408'};color:${r.type==='bot'?'var(--purple)':'var(--green)'}">${r.type==='bot'?'BOT':'YT'}</span></td>
+    <td style="color:var(--red)">${r.kills}</td><td style="color:var(--muted)">${r.survivalTime}s</td>
+    <td style="color:var(--muted)">${r.killedBy||'—'}</td>
+  </tr>`).join('')}</tbody></table></div>`;
+}
+function searchPlayer(){
+  const name=document.getElementById('playerNameInput').value.trim().toLowerCase();
+  const rc=document.getElementById('playerResultCard');
+  if(!name){rc.style.display='none';return;}
+  const vis=games.filter(g=>!g.practice||isAdmin);
+  const found=[];
+  vis.forEach(g=>{const r=g.results.find(p=>p.name.toLowerCase()===name);if(r)found.push({gameId:g.id,date:g.date,...r});});
+  if(!found.length){rc.style.display='block';rc.style.borderColor='var(--red)';document.getElementById('pResultName').innerHTML='<span style="color:var(--muted)">No player found with that name.</span>';document.getElementById('pStatGrid').innerHTML='';document.getElementById('pRecentGames').innerHTML='';return;}
+  const totalKills=found.reduce((s,f)=>s+f.kills,0);
+  const wins=found.filter(f=>f.rank===1).length;
+  const avgRank=Math.round(found.reduce((s,f)=>s+f.rank,0)/found.length);
+  const bestKills=Math.max(...found.map(f=>f.kills));
+  rc.style.display='block';rc.style.borderColor='var(--blue)';
+  document.getElementById('pResultName').innerHTML=`<span>${found[0].name}</span><span class="p-type-tag yt">YT</span>`;
+  document.getElementById('pStatGrid').innerHTML=`
+    <div class="ps-box gold"><div class="n">${found.length}</div><div class="l">Games</div></div>
+    <div class="ps-box red"><div class="n">${totalKills}</div><div class="l">Total Kills</div></div>
+    <div class="ps-box green"><div class="n">${wins}</div><div class="l">Wins 🏆</div></div>
+    <div class="ps-box blue"><div class="n">#${avgRank}</div><div class="l">Avg Rank</div></div>`;
+  document.getElementById('pRecentGames').innerHTML=found.slice(-5).reverse().map(f=>`
+    <div class="ps-game-row">
+      <span class="ps-rank">#${f.rank}</span>
+      <span style="flex:1">Game #${f.gameId}</span>
+      <span style="color:var(--red)">${f.kills} kills</span>
+      <span style="color:var(--muted);margin-left:8px">${f.survivalTime}s</span>
+      <span style="color:var(--muted);margin-left:8px;font-size:10px">${f.date}</span>
+    </div>`).join('');
+}
+
+// Init
+const canvas=document.getElementById('arenaCanvas');
+canvas.width=CANVAS_SIZE;canvas.height=CANVAS_SIZE;
+const ctx=canvas.getContext('2d');
+ctx.fillStyle='#050508';ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+const g2=ctx.createLinearGradient(PAD,PAD,CANVAS_SIZE-PAD,CANVAS_SIZE-PAD);
+g2.addColorStop(0,'#e05555');g2.addColorStop(1,'#5599e0');
+ctx.strokeStyle=g2;ctx.lineWidth=1.5;ctx.strokeRect(PAD,PAD,CANVAS_SIZE-PAD*2,CANVAS_SIZE-PAD*2);
+ctx.fillStyle='#2a2a3a';ctx.font='13px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillText('Waiting for the next battle...',CANVAS_SIZE/2,CANVAS_SIZE/2);
+renderHome();loadSelectOptions();
+</script>
