@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arena by Ilai</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--bg2:#0f0f1a;--bg3:#161625;--card:#111120;
+  --b:#20203a;--gold:#e5c46a;--red:#e05555;--blue:#5599e0;
+  --cyan:#4ae0d0;--green:#4ade80;--purple:#c084fc;
+  --tx:#e8e8f8;--mu:#5a5a7a
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+
+/* ── NAV ── */
+.bar{display:flex;align-items:center;gap:10px;padding:11px 22px;background:var(--bg2);border-bottom:1px solid var(--b);flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.logo-ic{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--red),var(--blue));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-t{font-size:14px;font-weight:800;letter-spacing:1.5px;color:var(--gold)}
+.logo-s{font-size:9px;color:var(--mu);letter-spacing:2px;text-transform:uppercase}
+.nav{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}
+.nb{padding:5px 13px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--mu);font-family:inherit;transition:all .15s}
+.nb:hover,.nb.on{background:var(--bg3);color:var(--tx);border-color:var(--b)}
+.adm-badge{background:var(--red);color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px}
+
+/* ── PAGES ── */
+.page{display:none;max-width:1100px;margin:0 auto;padding:18px}
+.page.on{display:block}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 14px;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid var(--b);background:var(--bg3);color:var(--tx);font-family:inherit;font-weight:500;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn.r{background:#180606;border-color:var(--red);color:var(--red)}.btn.r:hover{background:#220909}
+.btn.b{background:#060d1a;border-color:var(--blue);color:var(--blue)}.btn.b:hover{background:#0a1528}
+.btn.g{background:#100c00;border-color:var(--gold);color:var(--gold)}.btn.g:hover{background:#181200}
+.btn.c{background:#001410;border-color:var(--cyan);color:var(--cyan)}.btn.c:hover{background:#001c18}
+.btn.p{background:#100618;border-color:var(--purple);color:var(--purple)}.btn.p:hover{background:#180922}
+.btn.gr{background:#061006;border-color:var(--green);color:var(--green)}.btn.gr:hover{background:#091809}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:10px}
+.ct{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+
+/* ── FORM ELEMENTS ── */
+input[type=text],input[type=password],input[type=email],select,textarea{
+  padding:7px 11px;border-radius:7px;border:1px solid var(--b);
+  background:var(--bg2);color:var(--tx);font-size:12px;font-family:inherit;
+  transition:border-color .15s;width:100%
+}
+input:focus,select:focus{outline:none;border-color:var(--blue)}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.tag.lv{background:#081a08;color:var(--green)}
+.tag.pr{background:#001814;color:var(--cyan);border:1px solid var(--cyan)}
+.tag.en{background:var(--bg3);color:var(--mu)}
+
+/* ── NOTICES ── */
+.ntc{padding:9px 13px;border-radius:7px;font-size:12px;margin-bottom:10px;display:none;border:1px solid}
+.ntc.ok{background:#081508;color:var(--green);border-color:#1a4a1a}
+.ntc.warn{background:#140900;color:#fbbf24;border-color:#664400}
+.ntc.err{background:#180606;color:var(--red);border-color:#661a1a}
+.ntc.inf{background:#060d1a;color:var(--blue);border-color:#1a3a66}
+
+/* ═══════════════ HOME ═══════════════ */
+.home-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.hs{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:18px;text-align:center}
+.hs .n{font-size:30px;font-weight:800;margin-bottom:3px}
+.hs .l{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.8px}
+.last-banner{background:linear-gradient(135deg,#140606,#060d18);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.last-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),var(--blue))}
+.pod-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pc{flex:1;min-width:110px;display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:8px 12px}
+.pc.g1{border-color:#b8952a}.pc.g2{border-color:#666}.pc.g3{border-color:#7a5a3a}
+.pc .med{font-size:18px}.pc .pn{font-size:13px;font-weight:700}.pc .ps{font-size:10px;color:var(--mu)}
+.gr-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--b);border-radius:7px;padding:8px 12px;cursor:pointer;margin-bottom:5px;transition:all .15s}
+.gr-row:hover{border-color:var(--blue)}
+.gn-lbl{font-size:12px;font-weight:700;color:var(--gold);min-width:60px}
+.sh{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sh::after{content:'';flex:1;height:1px;background:var(--b);display:inline-block}
+
+/* ═══════════════ WATCH ═══════════════ */
+.watch-layout{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start}
+@media(max-width:720px){.watch-layout{grid-template-columns:1fr}}
+.arena-outer{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--b)}
+#ac{display:block;width:100%;aspect-ratio:1/1}
+.kf-wrap{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:3px;pointer-events:none;z-index:2}
+.ke{background:rgba(5,5,18,.92);color:var(--gold);font-size:10px;padding:3px 9px;border-radius:4px;white-space:nowrap;border-left:2px solid var(--red)}
+.arena-bar{display:flex;gap:7px;padding:9px 13px;align-items:center;flex-wrap:wrap;background:var(--bg2);border-top:1px solid var(--b)}
+.chip{font-size:11px;color:var(--mu);padding:3px 9px;background:var(--bg3);border-radius:5px;border:1px solid var(--b)}
+.chip span{color:var(--tx);font-weight:700}
+
+/* participant items */
+.pi{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg2);border:1px solid var(--b);border-radius:6px;font-size:11px;margin-bottom:4px;transition:all .15s}
+.pi.al{border-color:#4ade8022}.pi.dd{opacity:.35}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;overflow:hidden;border:1.5px solid transparent}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pn2{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.tt{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
+.tt.bot{background:#120820;color:var(--purple)}.tt.yt{background:#081408;color:var(--green)}
+.pr2{cursor:pointer;color:var(--mu);font-size:14px;line-height:1;padding:2px}.pr2:hover{color:var(--red)}
+.ar{display:flex;gap:5px;margin-top:6px}.ar input{flex:1;min-width:0;width:auto}
+.bg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:5px}
+.bb{padding:4px;font-size:10px;border-radius:5px;cursor:pointer;border:1px solid #3a1a5a;background:#100820;color:var(--purple);text-align:center;transition:all .15s}
+.bb:hover{background:#1a0f35}
+
+/* ═══════════════ STATS ═══════════════ */
+.search-banner{background:linear-gradient(135deg,#090614,#06091a);border:1px solid var(--b);border-radius:10px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.search-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.pcard{background:var(--bg2);border:1px solid var(--blue);border-radius:10px;padding:16px;margin-top:12px;display:none}
+.psg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+@media(max-width:480px){.psg{grid-template-columns:1fr 1fr}}
+.psb{background:var(--card);border:1px solid var(--b);border-radius:8px;padding:10px;text-align:center}
+.psb .n2{font-size:20px;font-weight:800}.psb .l2{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.ft{width:100%;border-collapse:collapse;font-size:12px}
+.ft th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:var(--mu);border-bottom:1px solid var(--b);text-transform:uppercase;letter-spacing:.5px}
+.ft td{padding:7px 10px;border-bottom:1px solid #121230}
+.ft tr:last-child td{border-bottom:none}
+.ft tr:hover td{background:#0f0f20}
+
+/* ═══════════════ SETTINGS ═══════════════ */
+.sg2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.rr label{font-size:12px;color:var(--mu);min-width:100px;flex-shrink:0}
+.rr input[type=range]{flex:1;accent-color:var(--blue);width:auto}
+.rv{font-size:12px;font-weight:700;min-width:36px;text-align:right;color:var(--tx)}
+.pw{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:13px;margin-bottom:8px}
+.pwh{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.pwi{font-size:20px;line-height:1.2}.pwn{font-size:13px;font-weight:700}.pwd{font-size:11px;color:var(--mu);line-height:1.5;margin-top:2px}
+.tog-r{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--b);margin-bottom:8px}
+.tog-r label{font-size:12px;flex:1}
+.tog{width:36px;height:20px;border-radius:10px;background:var(--bg3);border:1px solid var(--b);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0}
+.tog.on{background:var(--green);border-color:var(--green)}
+.tog::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all .2s}
+.tog.on::after{left:18px}
+.dl-list{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;margin-top:8px}
+.dl-item{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--bg3);border-radius:6px;font-size:12px}
+
+/* ═══════════════ ADMIN ═══════════════ */
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px}
+.yt-sub-card{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--bg2);border:1px solid var(--b);border-radius:7px;margin-bottom:5px}
+.yt-th{width:34px;height:34px;border-radius:50%;overflow:hidden;border:1px solid var(--b);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg3);font-size:11px;font-weight:700;color:var(--mu)}
+.yt-th img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.yt-info{flex:1;min-width:0}
+.yt-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yt-handle{font-size:10px;color:var(--mu)}
+
+/* ═══════════════ LOGIN ═══════════════ */
+.lw{display:flex;align-items:center;justify-content:center;min-height:55vh}
+.lc{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:30px;width:290px;text-align:center}
+.lc h2{font-size:17px;font-weight:800;margin-bottom:5px;color:var(--gold)}
+.lc p{font-size:12px;color:var(--mu);margin-bottom:18px}
+.lc input{margin-bottom:8px}
+.lc .btn{width:100%;justify-content:center}
+
+/* yt setup info box */
+.info-box{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:13px;margin-bottom:10px;font-size:11px;color:var(--mu);line-height:1.7}
+.info-box strong{color:var(--gold)}
+.info-box code{background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:10px;color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="bar">
+  <div class="logo-ic">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="3" width="8" height="8" rx="1.5" fill="#fff" opacity=".95"/>
+      <rect x="13" y="3" width="8" height="8" rx="1.5" fill="#fff" opacity=".5"/>
+      <rect x="3" y="13" width="8" height="8" rx="1.5" fill="#fff" opacity=".5"/>
+      <rect x="13" y="13" width="8" height="8" rx="1.5" fill="#fff" opacity=".95"/>
+    </svg>
+  </div>
+  <div>
+    <div class="logo-t">ARENA</div>
+    <div class="logo-s">by Ilai</div>
+  </div>
+  <nav class="nav">
+    <button class="nb on" onclick="sp('home')">Home</button>
+    <button class="nb" onclick="sp('watch')">Watch</button>
+    <button class="nb" onclick="sp('stats')">Stats</button>
+    <button class="nb" id="btnSettings" onclick="sp('settings')" style="display:none">Settings</button>
+    <button class="nb" id="btnAdmin" onclick="sp('admin')" style="display:none">Admin <span class="adm-badge">ADMIN</span></button>
+    <button class="nb" id="btnLogin" onclick="sp('login')">Login</button>
+  </nav>
+</div>
+
+<!-- ═══════ HOME ═══════ -->
+<div id="page-home" class="page on">
+  <div class="home-stats">
+    <div class="hs" style="border-color:#e5c46a22">
+      <div class="n" style="color:var(--gold)" id="hG">0</div>
+      <div class="l">Total Games</div>
+    </div>
+    <div class="hs" style="border-color:#5599e022">
+      <div class="n" style="color:var(--blue)" id="hP">0</div>
+      <div class="l">Unique Players</div>
+    </div>
+  </div>
+  <div class="last-banner" id="lbanner" style="display:none">
+    <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1px">⚔ Last Game Results</div>
+    <div class="pod-row" id="lpodium"></div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="lmeta"></div>
+  </div>
+  <div class="sh">Recent Games</div>
+  <div id="rg"><p style="color:var(--mu);font-size:12px">No games yet. Start one!</p></div>
+</div>
+
+<!-- ═══════ WATCH ═══════ -->
+<div id="page-watch" class="page">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <div style="font-size:15px;font-weight:800">Live Arena</div>
+    <span class="tag en" id="gtag">No active game</span>
+    <span id="glabel" style="font-size:11px;color:var(--mu)"></span>
+    <div id="agb" style="display:none;gap:6px;margin-left:auto;display:none;flex-wrap:wrap">
+      <button class="btn g" onclick="startGame(false)">▶ Start Battle</button>
+      <button class="btn c" onclick="startGame(true)">⚙ Practice</button>
+      <button class="btn r" onclick="endGame()">■ End</button>
+    </div>
+  </div>
+  <div class="watch-layout">
+    <div>
+      <div class="arena-outer">
+        <canvas id="ac"></canvas>
+        <div class="kf-wrap" id="kf"></div>
+      </div>
+      <div class="arena-bar">
+        <div class="chip">Alive: <span id="sA">0</span></div>
+        <div class="chip">Time: <span id="sT">0s</span></div>
+        <div class="chip">Kills: <span id="sK">0</span></div>
+      </div>
+      <div id="wlb" style="margin-top:12px"></div>
+    </div>
+    <div id="wsb"></div>
+  </div>
+</div>
+
+<!-- ═══════ STATS ═══════ -->
+<div id="page-stats" class="page">
+  <div class="search-banner">
+    <div style="font-size:15px;font-weight:800;margin-bottom:3px">🔍 Find Your Stats</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Enter your YouTube name to see your full battle history.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="text" id="pInput" placeholder="Your YouTube name..." style="flex:1;min-width:140px;width:auto">
+      <button class="btn b" onclick="searchP()">Search</button>
+    </div>
+    <div class="pcard" id="pcard">
+      <div style="font-size:17px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px" id="pnm"></div>
+      <div class="psg" id="pst"></div>
+      <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Recent games</div>
+      <div id="prec"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+    <div>
+      <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Select Game</div>
+      <select id="gsel" onchange="loadGS()" style="min-width:220px;width:auto"></select>
+    </div>
+    <div id="delbtn" style="display:none">
+      <button class="btn r" onclick="delGame()">🗑 Delete this game</button>
+    </div>
+  </div>
+  <div id="sc"><p style="color:var(--mu);font-size:12px">Select a game above.</p></div>
+</div>
+
+<!-- ═══════ SETTINGS (admin only) ═══════ -->
+<div id="page-settings" class="page" style="display:none">
+  <div class="sh">⚙ Game Settings</div>
+  <div class="ntc" id="snote"></div>
+  <div class="sg2">
+
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--blue)"></span>Physics</div>
+      <div class="rr">
+        <label>Player Speed</label>
+        <input type="range" id="spd" min="0.5" max="4" step="0.1" value="1.6"
+          oninput="document.getElementById('spdv').textContent=parseFloat(this.value).toFixed(1)">
+        <span class="rv" id="spdv">1.6</span>
+      </div>
+      <div class="rr">
+        <label>Damage / Hit</label>
+        <input type="range" id="dmg" min="1" max="20" step="1" value="5"
+          oninput="document.getElementById('dmgv').textContent=this.value">
+        <span class="rv" id="dmgv">5</span>
+      </div>
+      <div class="rr">
+        <label>Max HP</label>
+        <input type="range" id="mhp" min="20" max="200" step="5" value="60"
+          oninput="document.getElementById('mhpv').textContent=this.value">
+        <span class="rv" id="mhpv">60</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--gold)"></span>Kill Reward</div>
+      <div class="tog-r">
+        <label>Give HP on every kill</label>
+        <div class="tog" id="krtog" onclick="cfg.killReward=!cfg.killReward;this.classList.toggle('on',cfg.killReward)"></div>
+      </div>
+      <div class="rr">
+        <label>HP per kill</label>
+        <input type="range" id="khp" min="1" max="40" step="1" value="5"
+          oninput="document.getElementById('khpv').textContent=this.value">
+        <span class="rv" id="khpv">5</span>
+      </div>
+      <p style="font-size:11px;color:var(--mu)">Toggle Yes/No above. When ON, each kill gives the winner the chosen amount of HP (capped at max HP).</p>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <div class="ct"><span class="dot" style="background:var(--purple)"></span>Superpowers</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
+
+        <div class="pw" style="border-color:#5599e030">
+          <div class="pwh">
+            <span class="pwi">🔫</span>
+            <div><div class="pwn" style="color:var(--blue)">Gun Pickup</div>
+            <div class="pwd">Spawns once at a random spot. First player to touch it gets 3 shots fired at random enemies.</div></div>
+          </div>
+          <div class="rr"><label>Visible for</label><input type="range" id="gdur" min="3" max="30" step="1" value="10" oninput="document.getElementById('gdurv').textContent=this.value+'s'"><span class="rv" id="gdurv">10s</span></div>
+          <div class="rr"><label>Spawn after</label><input type="range" id="gspawn" min="5" max="60" step="5" value="15" oninput="document.getElementById('gspawnv').textContent=this.value+'s'"><span class="rv" id="gspawnv">15s</span></div>
+        </div>
+
+        <div class="pw" style="border-color:#c084fc30">
+          <div class="pwh">
+            <span class="pwi">🛡</span>
+            <div><div class="pwn" style="color:var(--purple)">Shield Pickup</div>
+            <div class="pwd">Spawns once at a random spot. First player to touch it gets 5 seconds of full damage protection.</div></div>
+          </div>
+          <div class="rr"><label>Visible for</label><input type="range" id="sdur" min="3" max="30" step="1" value="10" oninput="document.getElementById('sdurv').textContent=this.value+'s'"><span class="rv" id="sdurv">10s</span></div>
+          <div class="rr"><label>Spawn after</label><input type="range" id="sspawn" min="5" max="60" step="5" value="20" oninput="document.getElementById('sspawnv').textContent=this.value+'s'"><span class="rv" id="sspawnv">20s</span></div>
+        </div>
+
+        <div class="pw" style="border-color:#4ade8030;grid-column:1/-1">
+          <div class="pwh">
+            <span class="pwi">💚</span>
+            <div><div class="pwn" style="color:var(--green)">Double Life</div>
+            <div class="pwd">Selected participants revive once at 50% HP after they die. Check the players you want to give this power to:</div></div>
+          </div>
+          <div class="dl-list" id="dllist">
+            <p style="font-size:11px;color:var(--mu)">Add participants in Admin first.</p>
+          </div>
+        </div>
+
+      </div>
+      <button class="btn g" style="margin-top:14px;width:100%;justify-content:center" onclick="saveCfg()">💾 Save Settings</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ ADMIN ═══════ -->
+<div id="page-admin" class="page" style="display:none">
+  <div style="font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+    Admin Panel <span class="adm-badge">ADMIN</span>
+  </div>
+  <div class="ntc" id="anote"></div>
+  <div class="admin-grid">
+
+    <!-- YouTube -->
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--cyan)"></span>YouTube Subscribers</div>
+
+      <div class="info-box">
+        <strong>How to connect real YouTube subscribers:</strong><br>
+        1. Go to <strong>console.cloud.google.com</strong> → create a project<br>
+        2. Enable <strong>YouTube Data API v3</strong><br>
+        3. Create an <strong>API Key</strong> (Credentials section)<br>
+        4. Find your <strong>Channel ID</strong>: go to your YouTube channel → click your profile pic → Settings → Advanced → copy the ID starting with <code>UC</code><br>
+        5. Paste both below and click Load.<br><br>
+        <strong style="color:var(--red)">⚠ Important:</strong> This works only on the <strong>hosted version</strong> (GitHub Pages). The YouTube API blocks requests from local files due to CORS. Once hosted, paste your API key and channel ID — it will load real subscribers with real profile pictures.
+      </div>
+
+      <div style="margin-bottom:6px">
+        <div style="font-size:10px;color:var(--mu);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">API Key</div>
+        <input type="text" id="ytkey" placeholder="AIzaSy...">
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-size:10px;color:var(--mu);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Channel ID</div>
+        <input type="text" id="ytcid" placeholder="UCxxxxxxxxxxxxxxxxxxxxxxxx">
+      </div>
+      <button class="btn" style="width:100%;justify-content:center;margin-bottom:6px" onclick="fetchYT()">
+        <svg width="14" height="14" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Load Real Subscribers
+      </button>
+      <button class="btn" style="width:100%;justify-content:center;font-size:11px" onclick="loadDemo()">🎭 Load demo subscribers (testing)</button>
+
+      <div id="ytss" style="display:none;margin-top:10px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px" id="ytsc"></div>
+        <div id="ytsl" style="max-height:220px;overflow-y:auto"></div>
+        <button class="btn gr" style="margin-top:8px;width:100%;justify-content:center" onclick="addAllYT()">Add all to roster</button>
+      </div>
+    </div>
+
+    <!-- Roster -->
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--gold)"></span>Next Game Roster (<span id="apc">0</span>)</div>
+      <div style="max-height:210px;overflow-y:auto" id="apl"></div>
+      <div class="ar">
+        <input type="text" id="newp" placeholder="Add real player..." onkeydown="if(event.key==='Enter')addP()">
+        <button class="btn" onclick="addP()">+</button>
+      </div>
+      <div style="margin-top:8px">
+        <div style="font-size:10px;color:var(--mu);margin-bottom:4px">Quick-add bots:</div>
+        <div class="bg" id="botg"></div>
+        <div class="ar" style="margin-top:4px">
+          <input type="text" id="cbot" placeholder="Custom bot name...">
+          <button class="btn p" onclick="addCBot()">+Bot</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn g" onclick="startGame(false)">▶ Start Battle</button>
+        <button class="btn c" onclick="startGame(true)">⚙ Practice</button>
+        <button class="btn r" onclick="endGame()">■ End</button>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--red)"></span>Game History</div>
+      <div id="ah"><p style="color:var(--mu);font-size:12px">No games yet.</p></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="page-login" class="page" style="display:none">
+  <div class="lw">
+    <div class="lc">
+      <div style="font-size:24px;margin-bottom:8px">⚔</div>
+      <h2>Admin Access</h2>
+      <p>Enter your password to manage Arena games.</p>
+      <input type="password" id="ap" placeholder="Password" onkeydown="if(event.key==='Enter')tryLogin()">
+      <button class="btn g" onclick="tryLogin()" style="margin-top:4px">Enter Arena</button>
+      <p style="font-size:10px;color:var(--mu);margin-top:12px">Default password: <code style="background:var(--bg3);padding:2px 5px;border-radius:3px">ilai2024</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+                 JAVASCRIPT
+════════════════════════════════════════ -->
+<script>
+// ── CONSTANTS ──
+const PASS = 'ilai2024';
+const COLORS = ['#e5c46a','#e05555','#5599e0','#4ade80','#c084fc','#e09a55','#55cce0','#e055b0','#a0e055','#55e0a0','#e0d055','#b055e0'];
+const BOT_NAMES = ['BotAlpha','BotBeta','BotGamma','BotDelta','BotEpsilon','BotZeta','BotEta','BotSigma'];
+const CS = 520, PAD = 28; // canvas size, padding
+
+// ── STATE ──
+let isAdm = false, running = false, isPrac = false;
+let gInt = null, aFr = null, gTime = 0, elims = 0, gId = null;
+let fighters = [], kfeed = [], picks = [], bullets = [], borderHue = 0;
+let pickTimers = {gun: 0, shield: 0};
+let games = JSON.parse(localStorage.getItem('arenaGames') || '[]');
+let parts  = JSON.parse(localStorage.getItem('arenaParts') || '[]');
+let ytSubs = [];
+let cfg = {
+  speed: 1.6, dmg: 5, maxHP: 60,
+  killReward: false, killHP: 5,
+  gunDur: 10, gunSpawn: 15,
+  shieldDur: 10, shieldSpawn: 20,
+  dlSet: []   // names who have double life
+};
+
+// ── PERSIST ──
+function sv() {
+  localStorage.setItem('arenaGames', JSON.stringify(games));
+  localStorage.setItem('arenaParts', JSON.stringify(parts));
+}
+
+// ── NOTICES ──
+function ntc(id, msg, t) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.textContent = msg; e.className = 'ntc ' + t; e.style.display = 'block';
+  setTimeout(() => e.style.display = 'none', 3500);
+}
+
+// ── PAGE ROUTING ──
+function sp(p) {
+  document.querySelectorAll('.page').forEach(e => { e.classList.remove('on'); e.style.display = 'none'; });
+  document.querySelectorAll('.nb').forEach(e => e.classList.remove('on'));
+  const pg = document.getElementById('page-' + p);
+  if (pg) { pg.style.display = 'block'; pg.classList.add('on'); }
+  const nb = document.querySelector(`.nb[onclick="sp('${p}')"]`);
+  if (nb) nb.classList.add('on');
+  if (p === 'home') rHome();
+  if (p === 'stats') { loadSel(); }
+  if (p === 'admin' && isAdm) rAdmin();
+  if (p === 'settings' && isAdm) rDL();
+  if (p === 'watch') rSB();
+}
+
+// ── LOGIN ──
+function tryLogin() {
+  if (document.getElementById('ap').value === PASS) {
+    isAdm = true;
+    ['btnAdmin', 'btnSettings'].forEach(id => document.getElementById(id).style.display = 'inline-flex');
+    document.getElementById('btnLogin').style.display = 'none';
+    document.getElementById('agb').style.display = 'flex';
+    sp('admin');
+  } else {
+    const i = document.getElementById('ap');
+    i.value = ''; i.placeholder = 'Wrong password!';
+    setTimeout(() => i.placeholder = 'Password', 1500);
+  }
+}
+
+// ══════════════════════════════
+//             HOME
+// ══════════════════════════════
+function rHome() {
+  const vis = isAdm ? games : games.filter(g => !g.practice);
+  const pl = new Set(vis.flatMap(g => g.results.map(r => r.name))).size;
+  document.getElementById('hG').textContent = vis.length;
+  document.getElementById('hP').textContent = pl;
+
+  const last = vis[vis.length - 1];
+  const lb = document.getElementById('lbanner');
+  if (last) {
+    lb.style.display = 'block';
+    const md = ['🥇','🥈','🥉'];
+    document.getElementById('lpodium').innerHTML = last.results.slice(0,3).map((r,i) => `
+      <div class="pc g${i+1}">
+        <div class="med">${md[i]}</div>
+        <div><div class="pn">${r.name}</div><div class="ps">${r.kills} kills · ${r.survivalTime}s</div></div>
+      </div>`).join('');
+    document.getElementById('lmeta').innerHTML =
+      [`Game #${last.id}`, last.date, `${last.participants} fighters`, `${last.duration}s`]
+      .map(t => `<div style="font-size:11px;color:var(--mu);padding:3px 9px;background:var(--bg2);border:1px solid var(--b);border-radius:4px">${t}</div>`).join('');
+  } else lb.style.display = 'none';
+
+  const rg = document.getElementById('rg');
+  if (!vis.length) { rg.innerHTML = '<p style="color:var(--mu);font-size:12px">No games yet. Start one!</p>'; return; }
+  rg.innerHTML = [...vis].reverse().slice(0,10).map(g => `
+    <div class="gr-row" onclick="goG(${g.id})">
+      <span class="gn-lbl">#${g.id}${g.practice ? '<span class="tag pr" style="margin-left:4px">P</span>' : ''}</span>
+      <span style="flex:1;font-size:12px;color:var(--mu)">🏆 ${g.results[0]?.name || '—'} · ${g.results[0]?.kills || 0} kills</span>
+      <span style="font-size:11px;color:var(--mu)">${g.participants} fighters</span>
+      <span style="font-size:11px;color:var(--mu)">${g.date}</span>
+    </div>`).join('');
+}
+
+function goG(id) {
+  sp('stats');
+  setTimeout(() => {
+    document.getElementById('gsel').value = id;
+    loadGS();
+    if (isAdm) document.getElementById('delbtn').style.display = 'block';
+  }, 60);
+}
+
+// ══════════════════════════════
+//           SETTINGS
+// ══════════════════════════════
+function rDL() {
+  const el = document.getElementById('dllist');
+  if (!parts.length) { el.innerHTML = '<p style="font-size:11px;color:var(--mu)">Add participants in Admin first.</p>'; return; }
+  el.innerHTML = parts.map(p => `
+    <div class="dl-item">
+      <input type="checkbox" style="accent-color:var(--green);cursor:pointer;width:auto"
+        id="dl_${CSS.escape(p.name)}"
+        ${cfg.dlSet.includes(p.name) ? 'checked' : ''}
+        onchange="if(this.checked){if(!cfg.dlSet.includes('${p.name.replace(/'/g,"\\'")}'))cfg.dlSet.push('${p.name.replace(/'/g,"\\'")}');}else{cfg.dlSet=cfg.dlSet.filter(x=>x!=='${p.name.replace(/'/g,"\\'")}');}">
+      <label for="dl_${CSS.escape(p.name)}" style="cursor:pointer;flex:1">${p.name}</label>
+      <span style="font-size:10px;color:var(--mu)">${p.type === 'bot' ? 'BOT' : 'YT'}</span>
+    </div>`).join('');
+}
+
+function saveCfg() {
+  cfg.speed    = parseFloat(document.getElementById('spd').value);
+  cfg.dmg      = parseInt(document.getElementById('dmg').value);
+  cfg.maxHP    = parseInt(document.getElementById('mhp').value);
+  cfg.killHP   = parseInt(document.getElementById('khp').value);
+  cfg.gunDur   = parseInt(document.getElementById('gdur').value);
+  cfg.gunSpawn = parseInt(document.getElementById('gspawn').value);
+  cfg.shieldDur   = parseInt(document.getElementById('sdur').value);
+  cfg.shieldSpawn = parseInt(document.getElementById('sspawn').value);
+  ntc('snote', '✓ Settings saved!', 'ok');
+}
+
+// ══════════════════════════════
+//             ADMIN
+// ══════════════════════════════
+function rAdmin() {
+  rAList();
+  document.getElementById('botg').innerHTML = BOT_NAMES.map(b =>
+    `<div class="bb" onclick="addBot('${b}')">${b}</div>`).join('');
+  rAHist();
+}
+
+function rAList() {
+  document.getElementById('apc').textContent = parts.length;
+  document.getElementById('apl').innerHTML = parts.map((p, i) => `
+    <div class="pi">
+      <div class="av" style="background:${COLORS[i%COLORS.length]}18;color:${COLORS[i%COLORS.length]};border-color:${COLORS[i%COLORS.length]}44">
+        ${p.thumb ? `<img src="${p.thumb}" onerror="this.style.display='none'">` : p.name.slice(0,2).toUpperCase()}
+      </div>
+      <span class="pn2">${p.name}</span>
+      ${cfg.dlSet.includes(p.name) ? '<span title="Double Life" style="font-size:12px">💚</span>' : ''}
+      <span class="tt ${p.type === 'bot' ? 'bot' : 'yt'}">${p.type === 'bot' ? 'BOT' : 'YT'}</span>
+      <span class="pr2" onclick="remP(${i})">×</span>
+    </div>`).join('');
+  rSB();
+  if (document.getElementById('page-settings').classList.contains('on')) rDL();
+}
+
+function rAHist() {
+  const el = document.getElementById('ah');
+  if (!games.length) { el.innerHTML = '<p style="color:var(--mu);font-size:12px">No games yet.</p>'; return; }
+  el.innerHTML = [...games].reverse().slice(0,10).map(g => `
+    <div style="display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--bg2);border:1px solid var(--b);border-radius:6px;font-size:12px;margin-bottom:4px">
+      <span style="font-weight:700;color:var(--gold);min-width:50px">#${g.id}${g.practice ? '<span style="font-size:9px;color:var(--cyan);margin-left:3px">P</span>' : ''}</span>
+      <span style="flex:1;color:var(--mu)">🏆 ${g.results[0]?.name || '—'}</span>
+      <span style="font-size:10px;color:var(--mu)">${g.date}</span>
+    </div>`).join('');
+}
+
+function addP() {
+  const v = document.getElementById('newp').value.trim();
+  if (!v) return;
+  if (!parts.find(p => p.name === v)) parts.push({ name: v, type: 'real' });
+  document.getElementById('newp').value = '';
+  sv(); rAList();
+}
+function addBot(n) {
+  let nm = n, c = 1;
+  while (parts.find(p => p.name === nm)) nm = n + (c++);
+  parts.push({ name: nm, type: 'bot' });
+  sv(); rAList();
+}
+function addCBot() {
+  const v = document.getElementById('cbot').value.trim() || 'Bot' + Math.floor(Math.random() * 999);
+  let n = v, c = 1;
+  while (parts.find(p => p.name === n)) n = v + (c++);
+  parts.push({ name: n, type: 'bot' });
+  document.getElementById('cbot').value = '';
+  sv(); rAList();
+}
+function remP(i) { parts.splice(i, 1); sv(); rAList(); }
+
+// ── YOUTUBE ──
+async function fetchYT() {
+  const k = document.getElementById('ytkey').value.trim();
+  const c = document.getElementById('ytcid').value.trim();
+  if (!k || !c) { ntc('anote', 'Enter API key and Channel ID first.', 'warn'); return; }
+  ntc('anote', 'Loading subscribers…', 'inf');
+  try {
+    // Use the YouTube Data API v3 subscriptions endpoint
+    // Note: mySubscribers=true requires OAuth — API key alone only works for public data.
+    // For full subscriber list with profile pics, use the channels/subscribers endpoint.
+    const url = `https://www.googleapis.com/youtube/v3/subscriptions?part=subscriberSnippet&mySubscribers=true&maxResults=50&key=${k}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d.error) { ntc('anote', 'API Error: ' + d.error.message + ' — Make sure API key is valid and YouTube Data API v3 is enabled.', 'err'); return; }
+    ytSubs = (d.items || []).map(it => ({
+      name: it.subscriberSnippet.title,
+      handle: '@' + it.subscriberSnippet.title.replace(/\s+/g, '').toLowerCase(),
+      thumb: it.subscriberSnippet.thumbnails?.default?.url || null
+    }));
+    if (ytSubs.length === 0) ntc('anote', 'No subscribers found. Make sure your channel has subscribers and the API key has access.', 'warn');
+    else { showYT(); ntc('anote', ytSubs.length + ' subscriber(s) loaded!', 'ok'); }
+  } catch (e) {
+    ntc('anote', 'Failed to load. If hosted on GitHub Pages, you may need a CORS proxy. Error: ' + e.message, 'err');
+  }
+}
+
+function loadDemo() {
+  ytSubs = [
+    { name: 'IlaiArena', handle: '@ilaiarena', thumb: null },
+    { name: 'GamerPro99', handle: '@gamerpro99', thumb: null },
+    { name: 'NightOwl_YT', handle: '@nightowlyt', thumb: null }
+  ];
+  showYT();
+  ntc('anote', 'Demo subscribers loaded!', 'ok');
+}
+
+function showYT() {
+  document.getElementById('ytss').style.display = 'block';
+  document.getElementById('ytsc').textContent = ytSubs.length + ' subscriber' + (ytSubs.length !== 1 ? 's' : '') + ' found';
+  document.getElementById('ytsl').innerHTML = ytSubs.map((s, i) => `
+    <div class="yt-sub-card">
+      <div class="yt-th">
+        ${s.thumb
+          ? `<img src="${s.thumb}" onerror="this.parentElement.innerHTML='${s.name.slice(0,2).toUpperCase()}';">`
+          : s.name.slice(0,2).toUpperCase()}
+      </div>
+      <div class="yt-info">
+        <div class="yt-name">${s.name}</div>
+        <div class="yt-handle">${s.handle}</div>
+      </div>
+      <button class="btn gr" style="padding:3px 9px;font-size:10px" onclick="addYTSub(${i})">Add</button>
+    </div>`).join('');
+}
+
+function addYTSub(i) {
+  const s = ytSubs[i];
+  if (!parts.find(p => p.name === s.name)) parts.push({ name: s.name, type: 'real', thumb: s.thumb });
+  sv(); rAList();
+  ntc('anote', s.name + ' added to roster!', 'ok');
+}
+function addAllYT() {
+  ytSubs.forEach(s => { if (!parts.find(p => p.name === s.name)) parts.push({ name: s.name, type: 'real', thumb: s.thumb }); });
+  sv(); rAList();
+  ntc('anote', 'All subscribers added!', 'ok');
+}
+
+// ── WATCH SIDEBAR (admin only) ──
+function rSB() {
+  const sb = document.getElementById('wsb');
+  if (!isAdm) { sb.innerHTML = ''; return; }
+  sb.innerHTML = `
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--green)"></span>Roster (${parts.length})</div>
+      <div style="max-height:280px;overflow-y:auto">
+        ${running
+          ? fighters.map(f => `
+              <div class="pi ${f.alive ? 'al' : 'dd'}">
+                <div class="av" style="background:${f.color}18;color:${f.color};border-color:${f.color}44">
+                  ${f.name.slice(0,2).toUpperCase()}
+                </div>
+                <span class="pn2">${f.name}</span>
+                <span style="font-size:10px;color:var(--mu)">${Math.max(0,Math.round(f.hp))}hp</span>
+                ${f.hasGun && f.gunAmmo > 0 ? '<span title="Gun">🔫</span>' : ''}
+                ${f.shieldTimer > 0 ? '<span title="Shield">🛡</span>' : ''}
+                ${f.hasRevive ? '<span title="Double Life">💚</span>' : ''}
+              </div>`).join('')
+          : parts.map((p, i) => `
+              <div class="pi">
+                <div class="av" style="background:${COLORS[i%COLORS.length]}18;color:${COLORS[i%COLORS.length]};border-color:${COLORS[i%COLORS.length]}44">
+                  ${p.thumb ? `<img src="${p.thumb}" onerror="this.style.display='none'">` : p.name.slice(0,2).toUpperCase()}
+                </div>
+                <span class="pn2">${p.name}</span>
+                ${cfg.dlSet.includes(p.name) ? '<span>💚</span>' : ''}
+                <span class="tt ${p.type === 'bot' ? 'bot' : 'yt'}">${p.type === 'bot' ? 'BOT' : 'YT'}</span>
+              </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════
+//          GAME ENGINE
+// ══════════════════════════════
+function getFR() {
+  const n = Math.max(1, fighters.length || parts.length);
+  return Math.max(14, Math.min(25, 25 - Math.floor(n * 0.65)));
+}
+
+function startGame(prac) {
+  if (running) { ntc('anote', 'A game is already running!', 'warn'); return; }
+  if (parts.length < 2) { ntc('anote', 'Need at least 2 participants!', 'warn'); return; }
+  isPrac = prac; running = true; gTime = 0; elims = 0;
+  kfeed = []; picks = []; bullets = []; borderHue = 0;
+  pickTimers = { gun: cfg.gunSpawn, shield: cfg.shieldSpawn };
+  gId = games.length + 1;
+  const tg = document.getElementById('gtag');
+  tg.textContent = prac ? 'PRACTICE' : 'LIVE';
+  tg.className = prac ? 'tag pr' : 'tag lv';
+  document.getElementById('glabel').textContent = `Game #${gId}${prac ? ' · practice' : ''}`;
+  const cv = document.getElementById('ac');
+  cv.width = CS; cv.height = CS;
+  initF();
+  gInt = setInterval(() => { gTime++; document.getElementById('sT').textContent = gTime + 's'; tickPicks(); }, 1000);
+  sp('watch');
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  if (!running) { ntc('anote', 'No game running.', 'warn'); return; }
+  running = false;
+  clearInterval(gInt); if (aFr) cancelAnimationFrame(aFr);
+  document.getElementById('gtag').textContent = 'Ended';
+  document.getElementById('gtag').className = 'tag en';
+  saveRes(); rLB(); rSB();
+}
+
+// ── INIT FIGHTERS ──
+function initF() {
+  const n = parts.length;
+  const baseSpd = cfg.speed * (n > 10 ? 0.7 : n > 6 ? 0.85 : 1);
+  fighters = parts.map((p, i) => {
+    const ang = (i / n) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+    const spd = baseSpd * (0.8 + Math.random() * 0.4);
+    return {
+      name: p.name, type: p.type, color: COLORS[i % COLORS.length], thumb: p.thumb || null,
+      x: PAD + 22 + Math.random() * (CS - 2 * (PAD + 22)),
+      y: PAD + 22 + Math.random() * (CS - 2 * (PAD + 22)),
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      hp: cfg.maxHP, maxHP: cfg.maxHP, alive: true, kills: 0,
+      survivalTime: 0, killedBy: null, flashTimer: 0,
+      hasGun: false, gunAngle: 0, gunCooldown: 0, gunAmmo: 0,
+      hasRevive: cfg.dlSet.includes(p.name), revived: false,
+      shieldTimer: 0
+    };
+  });
+}
+
+// ── PICKUPS ──
+function tickPicks() {
+  ['gun', 'shield'].forEach(type => {
+    pickTimers[type]--;
+    if (pickTimers[type] <= 0 && !picks.find(pk => pk.type === type)) {
+      const dur = (type === 'gun' ? cfg.gunDur : cfg.shieldDur) * 60;
+      picks.push({
+        type,
+        x: PAD + 35 + Math.random() * (CS - 2 * (PAD + 35)),
+        y: PAD + 35 + Math.random() * (CS - 2 * (PAD + 35)),
+        life: dur, maxLife: dur, pulse: 0
+      });
+      pickTimers[type] = (type === 'gun' ? cfg.gunSpawn : cfg.shieldSpawn) + Math.floor(Math.random() * 10);
+    }
+  });
+  picks.forEach(pk => pk.life--);
+  picks = picks.filter(pk => pk.life > 0);
+}
+
+// ── PHYSICS ──
+function upd() {
+  const R = getFR(), min = PAD + R, max = CS - PAD - R;
+  const alive = fighters.filter(f => f.alive);
+
+  alive.forEach(f => {
+    // straight-line movement
+    f.x += f.vx; f.y += f.vy;
+    // wall bounce — reflect angle
+    if (f.x <= min) { f.x = min; f.vx = Math.abs(f.vx); }
+    if (f.x >= max) { f.x = max; f.vx = -Math.abs(f.vx); }
+    if (f.y <= min) { f.y = min; f.vy = Math.abs(f.vy); }
+    if (f.y >= max) { f.y = max; f.vy = -Math.abs(f.vy); }
+    if (f.flashTimer > 0) f.flashTimer--;
+    if (f.shieldTimer > 0) f.shieldTimer--;
+    f.survivalTime = gTime;
+
+    // gun rotation and firing
+    if (f.hasGun && f.gunAmmo > 0) {
+      f.gunAngle += 0.06;
+      f.gunCooldown--;
+      if (f.gunCooldown <= 0) {
+        const targets = alive.filter(e => e !== f);
+        if (targets.length) {
+          const t = targets[Math.floor(Math.random() * targets.length)];
+          const dx = t.x - f.x, dy = t.y - f.y, d = Math.sqrt(dx*dx + dy*dy) || 1;
+          bullets.push({ x: f.x, y: f.y, vx: (dx/d)*5.5, vy: (dy/d)*5.5, owner: f, life: 110, color: f.color });
+        }
+        f.gunAmmo--;
+        f.gunCooldown = 55;
+        if (f.gunAmmo <= 0) f.hasGun = false;
+      }
+    }
+
+    // pickup collection
+    picks.forEach((pk, pi) => {
+      const dx = f.x - pk.x, dy = f.y - pk.y;
+      if (dx*dx + dy*dy < (R + 14) * (R + 14)) {
+        if (pk.type === 'gun') { f.hasGun = true; f.gunAmmo = 3; f.gunCooldown = 20; addKF('🔫 ' + f.name + ' grabbed the Gun!'); }
+        if (pk.type === 'shield') { f.shieldTimer = 300; addKF('🛡 ' + f.name + ' grabbed the Shield!'); }
+        picks.splice(pi, 1);
+      }
+    });
+  });
+
+  // bullet update
+  bullets = bullets.filter(b => {
+    b.x += b.vx; b.y += b.vy; b.life--;
+    if (b.x < PAD || b.x > CS - PAD || b.y < PAD || b.y > CS - PAD || b.life <= 0) return false;
+    const R2 = getFR();
+    for (const f of fighters) {
+      if (!f.alive || f === b.owner || f.shieldTimer > 0) continue;
+      const dx = f.x - b.x, dy = f.y - b.y;
+      if (dx*dx + dy*dy < R2*R2) {
+        f.hp -= cfg.dmg * 1.5; f.flashTimer = 8;
+        chkDie(f, b.owner); return false;
+      }
+    }
+    return true;
+  });
+
+  // fighter vs fighter collisions
+  for (let i = 0; i < alive.length; i++) {
+    for (let j = i + 1; j < alive.length; j++) {
+      const a = alive[i], b = alive[j];
+      const dx = a.x - b.x, dy = a.y - b.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      const R2 = getFR() * 2;
+      if (d < R2 && d > 0.1) {
+        const nx = dx/d, ny = dy/d, ov = (R2 - d) / 2 + 0.5;
+        a.x += nx * ov; a.y += ny * ov;
+        b.x -= nx * ov; b.y -= ny * ov;
+        // elastic bounce
+        const dvx = a.vx - b.vx, dvy = a.vy - b.vy, dot = dvx*nx + dvy*ny;
+        if (dot < 0) { a.vx -= dot*nx; a.vy -= dot*ny; b.vx += dot*nx; b.vy += dot*ny; }
+        // damage
+        if (!a.shieldTimer) { a.hp -= cfg.dmg; a.flashTimer = 10; }
+        if (!b.shieldTimer) { b.hp -= cfg.dmg; b.flashTimer = 10; }
+        chkDie(a, b); chkDie(b, a);
+      }
+    }
+  }
+}
+
+function chkDie(f, killer) {
+  if (f.hp <= 0 && f.alive) {
+    if (f.hasRevive && !f.revived) {
+      f.hp = f.maxHP * 0.5; f.revived = true;
+      addKF('💚 ' + f.name + ' revived!');
+    } else {
+      f.alive = false; f.killedBy = killer.name;
+      killer.kills++; elims++;
+      if (cfg.killReward) killer.hp = Math.min(killer.maxHP, killer.hp + cfg.killHP);
+      addKF(killer.name + ' eliminated ' + f.name);
+    }
+  }
+}
+
+// ── DRAW ──
+function draw() {
+  const cv = document.getElementById('ac');
+  const ctx = cv.getContext('2d');
+  const S = CS;
+
+  // Enable smooth anti-aliasing
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  ctx.clearRect(0, 0, S, S);
+  ctx.fillStyle = '#050508'; ctx.fillRect(0, 0, S, S);
+
+  // subtle grid
+  ctx.strokeStyle = '#0d0d1c'; ctx.lineWidth = 1;
+  for (let x = PAD; x <= S-PAD; x += 44) { ctx.beginPath(); ctx.moveTo(x + 0.5, PAD); ctx.lineTo(x + 0.5, S-PAD); ctx.stroke(); }
+  for (let y = PAD; y <= S-PAD; y += 44) { ctx.beginPath(); ctx.moveTo(PAD, y + 0.5); ctx.lineTo(S-PAD, y + 0.5); ctx.stroke(); }
+
+  // animated border (slow color cycle, subtle)
+  borderHue = (borderHue + 0.2) % 360;
+  const bgrad = ctx.createLinearGradient(PAD, PAD, S-PAD, S-PAD);
+  bgrad.addColorStop(0, `hsl(${borderHue}, 65%, 50%)`);
+  bgrad.addColorStop(0.5, `hsl(${(borderHue + 100) % 360}, 65%, 50%)`);
+  bgrad.addColorStop(1, `hsl(${(borderHue + 200) % 360}, 65%, 50%)`);
+  ctx.strokeStyle = bgrad; ctx.lineWidth = 1.8;
+  ctx.strokeRect(PAD + 0.5, PAD + 0.5, S - PAD*2 - 1, S - PAD*2 - 1);
+
+  // corner accents
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+  [[PAD, PAD], [S-PAD, PAD], [S-PAD, S-PAD], [PAD, S-PAD]].forEach(([cx, cy]) => {
+    const dx = cx === PAD ? 1 : -1, dy = cy === PAD ? 1 : -1, sz = 11;
+    ctx.beginPath(); ctx.moveTo(cx, cy + dy*sz); ctx.lineTo(cx, cy); ctx.lineTo(cx + dx*sz, cy); ctx.stroke();
+  });
+
+  // ── PICKUPS ──
+  const now = Date.now();
+  picks.forEach(pk => {
+    const pulse = 0.65 + 0.35 * Math.sin(now / 350);
+    const pc = pk.type === 'gun' ? '#5599e0' : '#c084fc';
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.beginPath(); ctx.arc(pk.x, pk.y, 12, 0, Math.PI*2);
+    ctx.fillStyle = pc + '25'; ctx.fill();
+    ctx.strokeStyle = pc; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.font = '14px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(pk.type === 'gun' ? '🔫' : '🛡', pk.x, pk.y);
+    // timer bar
+    const pct = pk.life / pk.maxLife;
+    ctx.fillStyle = '#18182a'; ctx.fillRect(pk.x - 12, pk.y + 15, 24, 2.5);
+    ctx.fillStyle = pc; ctx.fillRect(pk.x - 12, pk.y + 15, 24 * pct, 2.5);
+    ctx.restore();
+  });
+
+  // ── BULLETS ──
+  bullets.forEach(b => {
+    ctx.save();
+    ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2);
+    ctx.fillStyle = b.color; ctx.fill();
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath(); ctx.arc(b.x, b.y, 5.5, 0, Math.PI*2);
+    ctx.fillStyle = b.color; ctx.fill();
+    ctx.restore();
+  });
+
+  // ── FIGHTERS ──
+  const R = getFR();
+  fighters.forEach(f => {
+    if (!f.alive) return;
+    const flash = f.flashTimer > 0 && Math.floor(f.flashTimer / 2) % 2 === 0;
+    const shielded = f.shieldTimer > 0;
+    ctx.save();
+
+    // shield spinning ring
+    if (shielded) {
+      const t = now / 700;
+      ctx.beginPath(); ctx.arc(f.x, f.y, R + 7, 0, Math.PI*2);
+      ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 1.8;
+      ctx.setLineDash([6, 4]); ctx.lineDashOffset = -t * 12; ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // soft glow
+    const gr = ctx.createRadialGradient(f.x, f.y, R * 0.2, f.x, f.y, R * 1.8);
+    gr.addColorStop(0, f.color + '30'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(f.x, f.y, R * 1.8, 0, Math.PI*2);
+    ctx.fillStyle = gr; ctx.fill();
+
+    // main circle
+    ctx.beginPath(); ctx.arc(f.x, f.y, R, 0, Math.PI*2);
+    ctx.fillStyle = flash ? '#ffffff1a' : f.color + '18'; ctx.fill();
+    ctx.strokeStyle = flash ? '#ffffff' : f.color; ctx.lineWidth = 2; ctx.stroke();
+
+    // initials — high quality
+    ctx.fillStyle = flash ? '#fff' : f.color;
+    ctx.font = `700 ${Math.max(9, R - 7)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(f.name.slice(0, 2).toUpperCase(), f.x, f.y);
+
+    // gun orbiting dot
+    if (f.hasGun && f.gunAmmo > 0) {
+      const gx = f.x + Math.cos(f.gunAngle) * (R + 5.5);
+      const gy = f.y + Math.sin(f.gunAngle) * (R + 5.5);
+      ctx.beginPath(); ctx.arc(gx, gy, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = '#5599e0'; ctx.fill();
+      ctx.beginPath(); ctx.arc(gx, gy, 5.5, 0, Math.PI*2);
+      ctx.fillStyle = '#5599e044'; ctx.fill();
+    }
+
+    // name label
+    ctx.font = `${Math.max(8, R - 10)}px -apple-system, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText(f.name.length > 9 ? f.name.slice(0, 9) + '…' : f.name, f.x, f.y + R + 9);
+
+    // HP bar
+    const hpPct = Math.max(0, f.hp) / f.maxHP;
+    const bw = R * 2 + 8;
+    ctx.fillStyle = '#141428';
+    if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(f.x - bw/2, f.y - R - 11, bw, 4.5, 2); ctx.fill(); }
+    else ctx.fillRect(f.x - bw/2, f.y - R - 11, bw, 4.5);
+    ctx.fillStyle = hpPct > 0.5 ? '#4ade80' : hpPct > 0.25 ? '#facc15' : '#e05555';
+    if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(f.x - bw/2, f.y - R - 11, bw * hpPct, 4.5, 2); ctx.fill(); }
+    else ctx.fillRect(f.x - bw/2, f.y - R - 11, bw * hpPct, 4.5);
+
+    ctx.restore();
+  });
+}
+
+// ── MAIN LOOP ──
+function loop() {
+  if (!running) return;
+  upd(); draw();
+  document.getElementById('sA').textContent = fighters.filter(f => f.alive).length;
+  document.getElementById('sK').textContent = elims;
+  kfeed.forEach(k => k.t--); kfeed = kfeed.filter(k => k.t > 0);
+  if (isAdm) rSB();
+  const aliveCount = fighters.filter(f => f.alive).length;
+  if (aliveCount <= 1) {
+    setTimeout(() => {
+      running = false; clearInterval(gInt); if (aFr) cancelAnimationFrame(aFr);
+      document.getElementById('gtag').textContent = 'Ended';
+      document.getElementById('gtag').className = 'tag en';
+      saveRes(); rLB(); rSB();
+    }, 1200);
+    return;
+  }
+  aFr = requestAnimationFrame(loop);
+}
+
+function addKF(msg) {
+  kfeed.unshift({ msg, t: 330 });
+  if (kfeed.length > 5) kfeed.pop();
+  document.getElementById('kf').innerHTML = kfeed.slice(0,5)
+    .map(k => `<div class="ke">${k.msg}</div>`).join('');
+}
+
+// ── SAVE RESULTS ──
+function saveRes() {
+  const al = fighters.filter(f => f.alive).sort((a,b) => b.kills - a.kills);
+  const de = fighters.filter(f => !f.alive).sort((a,b) => b.survivalTime - a.survivalTime);
+  const sorted = [...al, ...de];
+  games.push({
+    id: gId, practice: isPrac,
+    date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+    duration: gTime, participants: parts.length,
+    results: sorted.map((f, i) => ({
+      rank: i + 1, name: f.name, type: f.type,
+      kills: f.kills, survivalTime: f.survivalTime || gTime, killedBy: f.killedBy || null
+    }))
+  });
+  sv(); loadSel(); if (isAdm) rAHist(); rHome();
+}
+
+function rLB() {
+  const last = games[games.length - 1]; if (!last) return;
+  if (last.practice && !isAdm) return;
+  const md = ['🥇','🥈','🥉'];
+  document.getElementById('wlb').innerHTML = `
+    <div style="font-size:13px;font-weight:800;margin-bottom:8px">
+      Game #${last.id} Results
+      ${last.practice ? '<span class="tag pr" style="margin-left:6px">PRACTICE</span>' : ''}
+    </div>
+    <div class="pod-row">
+      ${last.results.slice(0,3).map((r,i) => `
+        <div class="pc g${i+1}">
+          <div class="med">${md[i]}</div>
+          <div><div class="pn">${r.name}</div><div class="ps">${r.kills} kills · ${r.survivalTime}s</div></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ══════════════════════════════
+//             STATS
+// ══════════════════════════════
+function loadSel() {
+  const sel = document.getElementById('gsel'); const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select a game —</option>';
+  const vis = isAdm ? games : games.filter(g => !g.practice);
+  vis.forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.id;
+    o.textContent = `Game #${g.id}${g.practice ? ' (Practice)' : ''} — ${g.date}`;
+    sel.appendChild(o);
+  });
+  if (cur) sel.value = cur;
+  else if (vis.length) { sel.value = vis[vis.length-1].id; loadGS(); }
+}
+
+function loadGS() {
+  const id = document.getElementById('gsel').value;
+  document.getElementById('delbtn').style.display = isAdm && id ? 'block' : 'none';
+  if (!id) { document.getElementById('sc').innerHTML = '<p style="color:var(--mu);font-size:12px">Select a game above.</p>'; return; }
+  const g = games.find(gm => gm.id == id); if (!g) return;
+  const md = ['🥇','🥈','🥉'];
+  const topK = [...g.results].sort((a,b) => b.kills - a.kills)[0];
+  const topS = [...g.results].sort((a,b) => b.survivalTime - a.survivalTime)[0];
+  document.getElementById('sc').innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="pc g1"><div class="med">🏆</div><div><div class="ps" style="font-size:10px">Most kills</div><div class="pn">${topK.name} (${topK.kills})</div></div></div>
+      <div class="pc g2"><div class="med">⏱</div><div><div class="ps" style="font-size:10px">Longest survival</div><div class="pn">${topS.name} (${topS.survivalTime}s)</div></div></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;overflow:hidden">
+      <table class="ft">
+        <thead><tr>
+          <th>#</th><th>Name</th><th>Type</th><th>Kills</th><th>Time</th><th>Eliminated by</th>
+        </tr></thead>
+        <tbody>
+          ${g.results.map((r,i) => `
+            <tr>
+              <td style="font-weight:800;color:var(--gold)">${md[i] || ('#' + r.rank)}</td>
+              <td style="font-weight:600">${r.name}</td>
+              <td><span class="tt ${r.type === 'bot' ? 'bot' : 'yt'}">${r.type === 'bot' ? 'BOT' : 'YT'}</span></td>
+              <td style="color:var(--red)">${r.kills}</td>
+              <td style="color:var(--mu)">${r.survivalTime}s</td>
+              <td style="color:var(--mu)">${r.killedBy || '—'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function delGame() {
+  const id = document.getElementById('gsel').value; if (!id) return;
+  if (!confirm('Delete Game #' + id + '? This cannot be undone.')) return;
+  games = games.filter(g => g.id != id); sv();
+  loadSel();
+  document.getElementById('sc').innerHTML = '<p style="color:var(--mu);font-size:12px">Game deleted.</p>';
+  document.getElementById('delbtn').style.display = 'none';
+  rHome(); if (isAdm) rAHist();
+}
+
+function searchP() {
+  const name = document.getElementById('pInput').value.trim().toLowerCase();
+  const rc = document.getElementById('pcard');
+  if (!name) { rc.style.display = 'none'; return; }
+  const vis = games.filter(g => !g.practice || isAdm);
+  const found = [];
+  vis.forEach(g => { const r = g.results.find(p => p.name.toLowerCase() === name); if (r) found.push({ gameId: g.id, date: g.date, ...r }); });
+  if (!found.length) {
+    rc.style.display = 'block'; rc.style.borderColor = 'var(--red)';
+    document.getElementById('pnm').innerHTML = '<span style="color:var(--mu)">No player found with that name.</span>';
+    document.getElementById('pst').innerHTML = ''; document.getElementById('prec').innerHTML = '';
+    return;
+  }
+  const totalKills = found.reduce((s, f) => s + f.kills, 0);
+  const wins = found.filter(f => f.rank === 1).length;
+  const avgRank = (found.reduce((s, f) => s + f.rank, 0) / found.length).toFixed(1);
+  const avgKills = (totalKills / found.length).toFixed(1);
+  const avgTime = Math.round(found.reduce((s, f) => s + f.survivalTime, 0) / found.length);
+  rc.style.display = 'block'; rc.style.borderColor = 'var(--blue)';
+  document.getElementById('pnm').innerHTML = `<span style="font-size:18px;font-weight:800">${found[0].name}</span><span class="tt yt" style="margin-left:4px">YT</span>`;
+  document.getElementById('pst').innerHTML = `
+    <div class="psb"><div class="n2" style="color:var(--gold)">${found.length}</div><div class="l2">Games</div></div>
+    <div class="psb"><div class="n2" style="color:var(--red)">${totalKills}</div><div class="l2">Total Kills</div></div>
+    <div class="psb"><div class="n2" style="color:var(--green)">${wins}</div><div class="l2">Wins 🏆</div></div>
+    <div class="psb"><div class="n2" style="color:var(--blue)">#${avgRank}</div><div class="l2">Avg Rank</div></div>
+    <div class="psb"><div class="n2" style="color:var(--cyan)">${avgKills}</div><div class="l2">Avg Kills</div></div>
+    <div class="psb"><div class="n2" style="color:var(--purple)">${avgTime}s</div><div class="l2">Avg Time</div></div>`;
+  document.getElementById('prec').innerHTML = found.slice(-5).reverse().map(f => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--card);border-radius:6px;font-size:12px;margin-bottom:4px">
+      <span style="font-weight:700;color:var(--gold);min-width:26px">#${f.rank}</span>
+      <span style="flex:1">Game #${f.gameId}</span>
+      <span style="color:var(--red)">${f.kills} kills</span>
+      <span style="color:var(--mu);margin-left:8px">${f.survivalTime}s</span>
+      <span style="font-size:10px;color:var(--mu);margin-left:8px">${f.date}</span>
+    </div>`).join('');
+}
+
+// ── INIT ──
+(function init() {
+  const cv = document.getElementById('ac');
+  cv.width = CS; cv.height = CS;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#050508'; ctx.fillRect(0, 0, CS, CS);
+  const ig = ctx.createLinearGradient(PAD, PAD, CS-PAD, CS-PAD);
+  ig.addColorStop(0, '#e05555'); ig.addColorStop(1, '#5599e0');
+  ctx.strokeStyle = ig; ctx.lineWidth = 1.8;
+  ctx.strokeRect(PAD + 0.5, PAD + 0.5, CS - PAD*2 - 1, CS - PAD*2 - 1);
+  ctx.fillStyle = '#252535'; ctx.font = '13px -apple-system, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('Waiting for the next battle...', CS/2, CS/2);
+  rHome(); loadSel();
+})();
+</script>
+</body>
+</html>
