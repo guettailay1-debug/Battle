@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arena by Ilai</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--bg2:#0f0f1a;--bg3:#161625;--card:#111120;
+  --b:#20203a;--gold:#e5c46a;--red:#e05555;--blue:#5599e0;
+  --cyan:#4ae0d0;--green:#4ade80;--purple:#c084fc;--orange:#f97316;
+  --tx:#e8e8f8;--mu:#5a5a7a
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.bar{display:flex;align-items:center;gap:10px;padding:11px 22px;background:var(--bg2);border-bottom:1px solid var(--b);flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.logo-ic{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--red),var(--blue));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-t{font-size:14px;font-weight:800;letter-spacing:1.5px;color:var(--gold)}
+.logo-s{font-size:9px;color:var(--mu);letter-spacing:2px;text-transform:uppercase}
+.nav{display:flex;gap:3px;margin-left:auto;flex-wrap:wrap}
+.nb{padding:5px 13px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--mu);font-family:inherit;transition:all .15s}
+.nb:hover,.nb.on{background:var(--bg3);color:var(--tx);border-color:var(--b)}
+.adm-badge{background:var(--red);color:#fff;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px}
+.page{display:none;max-width:1100px;margin:0 auto;padding:18px}
+.page.on{display:block}
+.btn{padding:7px 14px;border-radius:7px;font-size:12px;cursor:pointer;border:1px solid var(--b);background:var(--bg3);color:var(--tx);font-family:inherit;font-weight:500;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn.r{background:#180606;border-color:var(--red);color:var(--red)}.btn.r:hover{background:#220909}
+.btn.b{background:#060d1a;border-color:var(--blue);color:var(--blue)}.btn.b:hover{background:#0a1528}
+.btn.g{background:#100c00;border-color:var(--gold);color:var(--gold)}.btn.g:hover{background:#181200}
+.btn.c{background:#001410;border-color:var(--cyan);color:var(--cyan)}.btn.c:hover{background:#001c18}
+.btn.p{background:#100618;border-color:var(--purple);color:var(--purple)}.btn.p:hover{background:#180922}
+.btn.gr{background:#061006;border-color:var(--green);color:var(--green)}.btn.gr:hover{background:#091809}
+.btn.or{background:#180800;border-color:var(--orange);color:var(--orange)}.btn.or:hover{background:#221000}
+.card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:10px}
+.ct{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+input[type=text],input[type=password],input[type=number],select,textarea{padding:7px 11px;border-radius:7px;border:1px solid var(--b);background:var(--bg2);color:var(--tx);font-size:12px;font-family:inherit;transition:border-color .15s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}
+.tag{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.tag.lv{background:#081a08;color:var(--green)}.tag.pr{background:#001814;color:var(--cyan);border:1px solid var(--cyan)}.tag.en{background:var(--bg3);color:var(--mu)}
+.ntc{padding:9px 13px;border-radius:7px;font-size:12px;margin-bottom:10px;display:none;border:1px solid}
+.ntc.ok{background:#081508;color:var(--green);border-color:#1a4a1a}.ntc.warn{background:#140900;color:#fbbf24;border-color:#664400}.ntc.err{background:#180606;color:var(--red);border-color:#661a1a}.ntc.inf{background:#060d1a;color:var(--blue);border-color:#1a3a66}
+.sh{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sh::after{content:'';flex:1;height:1px;background:var(--b);display:inline-block}
+
+/* HOME */
+.home-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.hs{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:18px;text-align:center}
+.hs .n{font-size:30px;font-weight:800;margin-bottom:3px}
+.hs .l{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.8px}
+.last-banner{background:linear-gradient(135deg,#140606,#060d18);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.last-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),var(--blue))}
+.pod-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.pc{flex:1;min-width:110px;display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:8px 12px}
+.pc.g1{border-color:#b8952a}.pc.g2{border-color:#666}.pc.g3{border-color:#7a5a3a}
+.pc .med{font-size:18px}.pc .pn{font-size:13px;font-weight:700}.pc .ps{font-size:10px;color:var(--mu)}
+.gr-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--b);border-radius:7px;padding:8px 12px;cursor:pointer;margin-bottom:5px;transition:all .15s}
+.gr-row:hover{border-color:var(--blue)}
+.gn-lbl{font-size:12px;font-weight:700;color:var(--gold);min-width:60px}
+
+/* WATCH */
+.watch-layout{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start}
+@media(max-width:720px){.watch-layout{grid-template-columns:1fr}}
+.arena-outer{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--b)}
+#ac{display:block;width:100%;aspect-ratio:1/1}
+.kf-wrap{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:3px;pointer-events:none;z-index:2}
+.ke{background:rgba(5,5,18,.92);color:var(--gold);font-size:10px;padding:3px 9px;border-radius:4px;white-space:nowrap;border-left:2px solid var(--red)}
+.arena-bar{display:flex;gap:7px;padding:9px 13px;align-items:center;flex-wrap:wrap;background:var(--bg2);border-top:1px solid var(--b)}
+.chip{font-size:11px;color:var(--mu);padding:3px 9px;background:var(--bg3);border-radius:5px;border:1px solid var(--b)}
+.chip span{color:var(--tx);font-weight:700}
+.pi{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg2);border:1px solid var(--b);border-radius:6px;font-size:11px;margin-bottom:4px;transition:all .15s}
+.pi.al{border-color:#4ade8022}.pi.dd{opacity:.35}
+.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;overflow:hidden;border:1.5px solid transparent}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pn2{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.tt{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
+.tt.bot{background:#120820;color:var(--purple)}.tt.yt{background:#081408;color:var(--green)}
+.pr2{cursor:pointer;color:var(--mu);font-size:14px;line-height:1;padding:2px}.pr2:hover{color:var(--red)}
+.ar{display:flex;gap:5px;margin-top:6px}.ar input{flex:1;min-width:0;width:auto}
+.bg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:5px}
+.bb{padding:4px;font-size:10px;border-radius:5px;cursor:pointer;border:1px solid #3a1a5a;background:#100820;color:var(--purple);text-align:center;transition:all .15s}
+.bb:hover{background:#1a0f35}
+
+/* STATS */
+.search-banner{background:linear-gradient(135deg,#090614,#06091a);border:1px solid var(--b);border-radius:10px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.search-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.pcard{background:var(--bg2);border:1px solid var(--blue);border-radius:10px;padding:16px;margin-top:12px;display:none}
+.psg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+@media(max-width:480px){.psg{grid-template-columns:1fr 1fr}}
+.psb{background:var(--card);border:1px solid var(--b);border-radius:8px;padding:10px;text-align:center}
+.psb .n2{font-size:20px;font-weight:800}.psb .l2{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.ft{width:100%;border-collapse:collapse;font-size:12px}
+.ft th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:var(--mu);border-bottom:1px solid var(--b);text-transform:uppercase;letter-spacing:.5px}
+.ft td{padding:7px 10px;border-bottom:1px solid #121230}
+.ft tr:last-child td{border-bottom:none}
+.ft tr:hover td{background:#0f0f20}
+
+/* SETTINGS */
+.sg2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.rr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.rr label{font-size:12px;color:var(--mu);min-width:110px;flex-shrink:0}
+.rr input[type=range]{flex:1;accent-color:var(--blue);width:auto}
+.rv{font-size:12px;font-weight:700;min-width:36px;text-align:right;color:var(--tx)}
+.pw{background:var(--bg2);border:1px solid var(--b);border-radius:8px;padding:13px;margin-bottom:8px}
+.pwh{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.pwi{font-size:20px;line-height:1.2}.pwn{font-size:13px;font-weight:700}.pwd{font-size:11px;color:var(--mu);line-height:1.5;margin-top:2px}
+.tog-r{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--b);margin-bottom:8px}
+.tog-r label{font-size:12px;flex:1}
+.tog{width:36px;height:20px;border-radius:10px;background:var(--bg3);border:1px solid var(--b);position:relative;cursor:pointer;transition:all .2s;flex-shrink:0}
+.tog.on{background:var(--green);border-color:var(--green)}
+.tog::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all .2s}
+.tog.on::after{left:18px}
+.dl-list{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;margin-top:8px}
+.dl-item{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--bg3);border-radius:6px;font-size:12px}
+
+/* TIME PICKER */
+.time-picker{display:flex;align-items:center;gap:6px;margin-top:6px}
+.time-box{display:flex;flex-direction:column;align-items:center;gap:2px}
+.time-box input{width:52px;text-align:center;padding:6px 4px;font-size:16px;font-weight:700;background:var(--bg3);border:1px solid var(--b);border-radius:6px;color:var(--tx)}
+.time-box label{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
+.time-sep{font-size:18px;font-weight:700;color:var(--mu);margin-top:-12px}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px}
+.yt-sub-card{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--bg2);border:1px solid var(--b);border-radius:7px;margin-bottom:5px}
+.yt-th{width:34px;height:34px;border-radius:50%;overflow:hidden;border:1px solid var(--b);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg3);font-size:11px;font-weight:700;color:var(--mu)}
+.yt-th img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.yt-info{flex:1;min-width:0}
+.yt-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yt-handle{font-size:10px;color:var(--mu)}
+.history-item{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--bg2);border:1px solid var(--b);border-radius:6px;font-size:12px;margin-bottom:4px;transition:all .15s}
+.history-item:hover{border-color:var(--red)}
+.history-item:hover .del-x{opacity:1}
+.del-x{opacity:0;cursor:pointer;color:var(--red);font-size:14px;font-weight:700;transition:opacity .15s;padding:2px 6px;border-radius:4px;background:#200606}
+.del-x:hover{background:#2d0909}
+
+/* MODAL (scan bot / edit) */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1000;display:none}
+.modal-overlay.on{display:flex}
+.modal{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:22px;width:min(480px,94vw);max-height:88vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:800;margin-bottom:6px}
+.modal .close{float:right;cursor:pointer;color:var(--mu);font-size:18px;line-height:1}
+.modal .close:hover{color:var(--red)}
+.scan-preview{display:flex;flex-direction:column;gap:5px;max-height:240px;overflow-y:auto;margin-top:10px}
+.scan-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg2);border:1px solid var(--b);border-radius:7px;font-size:12px}
+.scan-item input{flex:1;width:auto;padding:4px 8px;font-size:12px}
+textarea{resize:vertical;min-height:80px}
+
+/* LOGIN */
+.lw{display:flex;align-items:center;justify-content:center;min-height:55vh}
+.lc{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:30px;width:290px;text-align:center}
+.lc h2{font-size:17px;font-weight:800;margin-bottom:5px;color:var(--gold)}
+.lc p{font-size:12px;color:var(--mu);margin-bottom:18px}
+.lc input{margin-bottom:8px}
+.lc .btn{width:100%;justify-content:center}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="bar">
+  <div class="logo-ic">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="3" width="8" height="8" rx="1.5" fill="#fff" opacity=".95"/>
+      <rect x="13" y="3" width="8" height="8" rx="1.5" fill="#fff" opacity=".5"/>
+      <rect x="3" y="13" width="8" height="8" rx="1.5" fill="#fff" opacity=".5"/>
+      <rect x="13" y="13" width="8" height="8" rx="1.5" fill="#fff" opacity=".95"/>
+    </svg>
+  </div>
+  <div><div class="logo-t">ARENA</div><div class="logo-s">by Ilai</div></div>
+  <nav class="nav">
+    <button class="nb on" onclick="sp('home')">Home</button>
+    <button class="nb" onclick="sp('watch')">Watch</button>
+    <button class="nb" onclick="sp('stats')">Stats</button>
+    <button class="nb" id="btnSettings" onclick="sp('settings')" style="display:none">Settings</button>
+    <button class="nb" id="btnAdmin" onclick="sp('admin')" style="display:none">Admin <span class="adm-badge">ADMIN</span></button>
+    <button class="nb" id="btnLogin" onclick="sp('login')">Login</button>
+  </nav>
+</div>
+
+<!-- HOME -->
+<div id="page-home" class="page on">
+  <div class="home-stats">
+    <div class="hs" style="border-color:#e5c46a22"><div class="n" style="color:var(--gold)" id="hG">0</div><div class="l">Total Games</div></div>
+    <div class="hs" style="border-color:#5599e022"><div class="n" style="color:var(--blue)" id="hP">0</div><div class="l">Unique Players</div></div>
+  </div>
+  <div class="last-banner" id="lbanner" style="display:none">
+    <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1px">⚔ Last Game Results</div>
+    <div class="pod-row" id="lpodium"></div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="lmeta"></div>
+  </div>
+  <div class="sh">Recent Games</div>
+  <div id="rg"><p style="color:var(--mu);font-size:12px">No games yet.</p></div>
+</div>
+
+<!-- WATCH -->
+<div id="page-watch" class="page">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <div style="font-size:15px;font-weight:800">Live Arena</div>
+    <span class="tag en" id="gtag">No active game</span>
+    <span id="glabel" style="font-size:11px;color:var(--mu)"></span>
+    <div id="agb" style="display:none;gap:6px;margin-left:auto;flex-wrap:wrap">
+      <button class="btn g" onclick="startGame(false)">▶ Start</button>
+      <button class="btn c" onclick="startGame(true)">⚙ Practice</button>
+      <button class="btn or" id="pauseBtn" onclick="togglePause()" style="display:none">⏸ Pause</button>
+      <button class="btn r" onclick="endGame()">■ End</button>
+    </div>
+  </div>
+  <div class="watch-layout">
+    <div>
+      <div class="arena-outer"><canvas id="ac"></canvas><div class="kf-wrap" id="kf"></div></div>
+      <div class="arena-bar">
+        <div class="chip">Alive: <span id="sA">0</span></div>
+        <div class="chip">Time: <span id="sT">0s</span></div>
+        <div class="chip">Kills: <span id="sK">0</span></div>
+      </div>
+      <div id="wlb" style="margin-top:12px"></div>
+    </div>
+    <div id="wsb"></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="page-stats" class="page">
+  <div class="search-banner">
+    <div style="font-size:15px;font-weight:800;margin-bottom:3px">🔍 Find Your Stats</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Enter your YouTube name to see your full battle history.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="text" id="pInput" placeholder="Your YouTube name..." style="flex:1;min-width:140px;width:auto">
+      <button class="btn b" onclick="searchP()">Search</button>
+    </div>
+    <div class="pcard" id="pcard">
+      <div style="font-size:17px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px" id="pnm"></div>
+      <div class="psg" id="pst"></div>
+      <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Recent games</div>
+      <div id="prec"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px">
+    <div>
+      <div style="font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Select Game</div>
+      <select id="gsel" onchange="loadGS()" style="min-width:220px;width:auto"></select>
+    </div>
+    <div id="delbtn" style="display:none"><button class="btn r" onclick="delGame()">🗑 Delete game</button></div>
+  </div>
+  <div id="sc"><p style="color:var(--mu);font-size:12px">Select a game above.</p></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="page-settings" class="page" style="display:none">
+  <div class="sh">⚙ Game Settings</div>
+  <div class="ntc" id="snote"></div>
+  <div class="sg2">
+
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--blue)"></span>Physics</div>
+      <div class="rr"><label>Player Speed</label><input type="range" id="spd" min="0.5" max="4" step="0.1" value="1.6" oninput="document.getElementById('spdv').textContent=parseFloat(this.value).toFixed(1)"><span class="rv" id="spdv">1.6</span></div>
+      <div class="rr"><label>Damage / Hit</label><input type="range" id="dmg" min="1" max="20" step="1" value="5" oninput="document.getElementById('dmgv').textContent=this.value"><span class="rv" id="dmgv">5</span></div>
+      <div class="rr"><label>Max HP</label><input type="range" id="mhp" min="20" max="200" step="5" value="60" oninput="document.getElementById('mhpv').textContent=this.value"><span class="rv" id="mhpv">60</span></div>
+    </div>
+
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--gold)"></span>Kill Reward</div>
+      <div class="tog-r"><label>Give HP on every kill</label><div class="tog" id="krtog" onclick="cfg.killReward=!cfg.killReward;this.classList.toggle('on',cfg.killReward)"></div></div>
+      <div class="rr"><label>HP per kill</label><input type="range" id="khp" min="1" max="40" step="1" value="5" oninput="document.getElementById('khpv').textContent=this.value"><span class="rv" id="khpv">5</span></div>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <div class="ct"><span class="dot" style="background:var(--purple)"></span>Superpowers</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
+
+        <!-- GUN -->
+        <div class="pw" style="border-color:#5599e030">
+          <div class="pwh">
+            <span class="pwi">🔫</span>
+            <div><div class="pwn" style="color:var(--blue)">Gun Pickup</div>
+            <div class="pwd">First to touch gets 3 shots. Configure below.</div></div>
+          </div>
+          <div class="tog-r" style="border:none;margin-bottom:6px"><label>Enable in game</label><div class="tog" id="gunTog" onclick="cfg.gunEnabled=!cfg.gunEnabled;this.classList.toggle('on',cfg.gunEnabled)"></div></div>
+          <div class="rr"><label>Times per game</label><input type="number" id="gunCount" min="1" max="10" value="2" style="width:60px;text-align:center"><span style="font-size:11px;color:var(--mu);flex:1;margin-left:6px">times</span></div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">Visible for (mm:ss):</div>
+          <div class="time-picker">
+            <div class="time-box"><input type="number" id="gunDurM" min="0" max="10" value="0" placeholder="0"><label>min</label></div>
+            <div class="time-sep">:</div>
+            <div class="time-box"><input type="number" id="gunDurS" min="0" max="59" value="10" placeholder="10"><label>sec</label></div>
+          </div>
+          <div style="font-size:11px;color:var(--mu);margin:8px 0 5px">First spawn after (mm:ss):</div>
+          <div class="time-picker">
+            <div class="time-box"><input type="number" id="gunSpawnM" min="0" max="59" value="0" placeholder="0"><label>min</label></div>
+            <div class="time-sep">:</div>
+            <div class="time-box"><input type="number" id="gunSpawnS" min="0" max="59" value="15" placeholder="15"><label>sec</label></div>
+          </div>
+        </div>
+
+        <!-- SHIELD -->
+        <div class="pw" style="border-color:#c084fc30">
+          <div class="pwh">
+            <span class="pwi">🛡</span>
+            <div><div class="pwn" style="color:var(--purple)">Shield Pickup</div>
+            <div class="pwd">First to touch gets 5s of full protection. Configure below.</div></div>
+          </div>
+          <div class="tog-r" style="border:none;margin-bottom:6px"><label>Enable in game</label><div class="tog" id="shieldTog" onclick="cfg.shieldEnabled=!cfg.shieldEnabled;this.classList.toggle('on',cfg.shieldEnabled)"></div></div>
+          <div class="rr"><label>Times per game</label><input type="number" id="shieldCount" min="1" max="10" value="2" style="width:60px;text-align:center"><span style="font-size:11px;color:var(--mu);flex:1;margin-left:6px">times</span></div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">Visible for (mm:ss):</div>
+          <div class="time-picker">
+            <div class="time-box"><input type="number" id="shieldDurM" min="0" max="10" value="0" placeholder="0"><label>min</label></div>
+            <div class="time-sep">:</div>
+            <div class="time-box"><input type="number" id="shieldDurS" min="0" max="59" value="10" placeholder="10"><label>sec</label></div>
+          </div>
+          <div style="font-size:11px;color:var(--mu);margin:8px 0 5px">First spawn after (mm:ss):</div>
+          <div class="time-picker">
+            <div class="time-box"><input type="number" id="shieldSpawnM" min="0" max="59" value="0" placeholder="0"><label>min</label></div>
+            <div class="time-sep">:</div>
+            <div class="time-box"><input type="number" id="shieldSpawnS" min="0" max="59" value="20" placeholder="20"><label>sec</label></div>
+          </div>
+        </div>
+
+        <!-- GHOST -->
+        <div class="pw" style="border-color:#f9731630">
+          <div class="pwh">
+            <span class="pwi">👻</span>
+            <div><div class="pwn" style="color:var(--orange)">Ghost Pickup</div>
+            <div class="pwd">First to touch passes through everyone for set seconds — takes no damage, glows orange. Still visible.</div></div>
+          </div>
+          <div class="tog-r" style="border:none;margin-bottom:6px"><label>Enable in game</label><div class="tog" id="ghostTog" onclick="cfg.ghostEnabled=!cfg.ghostEnabled;this.classList.toggle('on',cfg.ghostEnabled)"></div></div>
+          <div class="rr"><label>Times per game</label><input type="number" id="ghostCount" min="1" max="10" value="2" style="width:60px;text-align:center"><span style="font-size:11px;color:var(--mu);flex:1;margin-left:6px">times</span></div>
+          <div style="font-size:11px;color:var(--mu);margin-bottom:5px">Ghost duration (mm:ss):</div>
+          <div class="time-picker">
+            <div class="time-box"><input type="number" id="ghostDurM" min="0" max="10" value="0" placeholder="0"><label>min</label></div>
+            <div class="time-sep">:</div>
+            <div class="time-box"><input type="number" id="ghostDurS" min="0" max="59" value="5" placeholder="5"><label>sec</label></div>
+          </div>
+          <div style="font-size:11px;color:var(--mu);margin:8px 0 5px">Visible for (mm:ss):</div>
+          <div class="time-picker">
+            <div class="time-box"><input type="number" id="ghostPickupDurM" min="0" max="10" value="0" placeholder="0"><label>min</label></div>
+            <div class="time-sep">:</div>
+            <div class="time-box"><input type="number" id="ghostPickupDurS" min="0" max="59" value="10" placeholder="10"><label>sec</label></div>
+          </div>
+          <div style="font-size:11px;color:var(--mu);margin:8px 0 5px">First spawn after (mm:ss):</div>
+          <div class="time-picker">
+            <div class="time-box"><input type="number" id="ghostSpawnM" min="0" max="59" value="0" placeholder="0"><label>min</label></div>
+            <div class="time-sep">:</div>
+            <div class="time-box"><input type="number" id="ghostSpawnS" min="0" max="59" value="25" placeholder="25"><label>sec</label></div>
+          </div>
+        </div>
+
+        <!-- DOUBLE LIFE -->
+        <div class="pw" style="border-color:#4ade8030">
+          <div class="pwh"><span class="pwi">💚</span><div>
+            <div class="pwn" style="color:var(--green)">Double Life</div>
+            <div class="pwd">Selected players revive once at 50% HP. Check who gets it:</div>
+          </div></div>
+          <div class="dl-list" id="dllist"><p style="font-size:11px;color:var(--mu)">Add participants in Admin first.</p></div>
+        </div>
+
+      </div>
+      <button class="btn g" style="margin-top:14px;width:100%;justify-content:center" onclick="saveCfg()">💾 Save Settings</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="page-admin" class="page" style="display:none">
+  <div style="font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px">Admin Panel <span class="adm-badge">ADMIN</span></div>
+  <div class="ntc" id="anote"></div>
+  <div class="admin-grid">
+
+    <!-- Scan Bot -->
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--cyan)"></span>Name Scanner Bot</div>
+      <p style="font-size:11px;color:var(--mu);line-height:1.6;margin-bottom:10px">
+        Can't connect YouTube API? Paste a list of subscriber names (one per line) below. The bot will add them all to the roster. You can edit each name after.
+      </p>
+      <textarea id="scanInput" placeholder="Paste names here, one per line:&#10;GamerPro99&#10;NightOwl&#10;xX_Sniper_Xx" style="margin-bottom:8px;height:100px"></textarea>
+      <button class="btn c" style="width:100%;justify-content:center" onclick="runScanBot()">📋 Import Names</button>
+      <div id="scanPreview" class="scan-preview" style="margin-top:8px"></div>
+    </div>
+
+    <!-- Roster -->
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--gold)"></span>Next Game Roster (<span id="apc">0</span>)</div>
+      <div style="max-height:210px;overflow-y:auto" id="apl"></div>
+      <div class="ar">
+        <input type="text" id="newp" placeholder="Add real player..." onkeydown="if(event.key==='Enter')addP()">
+        <button class="btn" onclick="addP()">+</button>
+      </div>
+      <div style="margin-top:8px">
+        <div style="font-size:10px;color:var(--mu);margin-bottom:4px">Quick-add bots:</div>
+        <div class="bg" id="botg"></div>
+        <div class="ar" style="margin-top:4px">
+          <input type="text" id="cbot" placeholder="Custom bot name...">
+          <button class="btn p" onclick="addCBot()">+Bot</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn g" onclick="startGame(false)">▶ Start</button>
+        <button class="btn c" onclick="startGame(true)">⚙ Practice</button>
+        <button class="btn r" onclick="endGame()">■ End</button>
+      </div>
+    </div>
+
+    <!-- History with delete on hover -->
+    <div class="card">
+      <div class="ct"><span class="dot" style="background:var(--red)"></span>Game History <span style="font-size:10px;color:var(--mu);margin-left:4px;font-weight:400;text-transform:none;letter-spacing:0">(hover to delete)</span></div>
+      <div id="ah"><p style="color:var(--mu);font-size:12px">No games yet.</p></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="page-login" class="page" style="display:none">
+  <div class="lw"><div class="lc">
+    <div style="font-size:24px;margin-bottom:8px">⚔</div>
+    <h2>Admin Access</h2>
+    <p>Enter your password to manage Arena games.</p>
+    <input type="password" id="ap" placeholder="Password" onkeydown="if(event.key==='Enter')tryLogin()">
+    <button class="btn g" onclick="tryLogin()" style="margin-top:4px">Enter Arena</button>
+    <p style="font-size:10px;color:var(--mu);margin-top:12px">Default: <code style="background:var(--bg3);padding:2px 5px;border-radius:3px">ilai2024</code></p>
+  </div></div>
+</div>
+
+<!-- SCAN BOT EDIT MODAL -->
+<div class="modal-overlay" id="scanModal">
+  <div class="modal">
+    <span class="close" onclick="document.getElementById('scanModal').classList.remove('on')">✕</span>
+    <h3>📋 Review Imported Names</h3>
+    <p style="font-size:12px;color:var(--mu);margin-top:4px;margin-bottom:4px">Edit names if needed, then click Add All.</p>
+    <div class="scan-preview" id="scanList"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn gr" style="flex:1;justify-content:center" onclick="confirmScan()">✓ Add All to Roster</button>
+      <button class="btn r" onclick="document.getElementById('scanModal').classList.remove('on')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//   ARENA BY ILAI — Full Game v6
+//   Persistent storage via localStorage
+// ══════════════════════════════════════════
+
+const PASS = 'ilai2024';
+const COLORS = ['#e5c46a','#e05555','#5599e0','#4ade80','#c084fc','#e09a55','#55cce0','#e055b0','#a0e055','#55e0a0','#e0d055','#b055e0'];
+const BOT_NAMES = ['BotAlpha','BotBeta','BotGamma','BotDelta','BotEpsilon','BotZeta','BotEta','BotSigma'];
+const CS = 520, PAD = 28;
+
+// ── PERSISTENT STATE ──
+// Everything lives in localStorage so it survives page refresh, device change (same browser), etc.
+// For cross-device sync you'd need a backend — localStorage is device-local.
+let games = JSON.parse(localStorage.getItem('arenaGames') || '[]');
+let parts  = JSON.parse(localStorage.getItem('arenaParts') || '[]');
+let cfg    = JSON.parse(localStorage.getItem('arenaCfg')   || JSON.stringify({
+  speed:1.6, dmg:5, maxHP:60, killReward:false, killHP:5,
+  gunEnabled:false, gunCount:2, gunDurM:0, gunDurS:10, gunSpawnM:0, gunSpawnS:15,
+  shieldEnabled:false, shieldCount:2, shieldDurM:0, shieldDurS:10, shieldSpawnM:0, shieldSpawnS:20,
+  ghostEnabled:false, ghostCount:2, ghostDurM:0, ghostDurS:5, ghostPickupDurM:0, ghostPickupDurS:10, ghostSpawnM:0, ghostSpawnS:25,
+  dlSet:[]
+}));
+
+// ── RUNTIME STATE ──
+let isAdm=false, running=false, paused=false, isPrac=false;
+let gInt=null, aFr=null, gTime=0, elims=0, gId=null;
+let fighters=[], kfeed=[], picks=[], bullets=[], borderHue=0;
+// pickup spawn counters: {type, remaining (times left to spawn), nextSpawn (seconds), active}
+let pickupState=[];
+
+function sv() {
+  localStorage.setItem('arenaGames', JSON.stringify(games));
+  localStorage.setItem('arenaParts', JSON.stringify(parts));
+  localStorage.setItem('arenaCfg',   JSON.stringify(cfg));
+}
+function ntc(id,msg,t){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.className='ntc '+t;e.style.display='block';setTimeout(()=>e.style.display='none',3500);}
+function toSec(m,s){return parseInt(m||0)*60+parseInt(s||0);}
+
+// ══ PAGE ROUTING ══
+function sp(p){
+  document.querySelectorAll('.page').forEach(e=>{e.classList.remove('on');e.style.display='none'});
+  document.querySelectorAll('.nb').forEach(e=>e.classList.remove('on'));
+  const pg=document.getElementById('page-'+p);if(pg){pg.style.display='block';pg.classList.add('on');}
+  const nb=document.querySelector(`.nb[onclick="sp('${p}')"]`);if(nb)nb.classList.add('on');
+  if(p==='home')rHome();
+  if(p==='stats')loadSel();
+  if(p==='admin'&&isAdm)rAdmin();
+  if(p==='settings'&&isAdm){applyCfgToUI();rDL();}
+  if(p==='watch')rSB();
+}
+
+// ══ LOGIN ══
+function tryLogin(){
+  if(document.getElementById('ap').value===PASS){
+    isAdm=true;
+    ['btnAdmin','btnSettings'].forEach(id=>document.getElementById(id).style.display='inline-flex');
+    document.getElementById('btnLogin').style.display='none';
+    document.getElementById('agb').style.display='flex';
+    sp('admin');
+  } else {
+    const i=document.getElementById('ap');i.value='';i.placeholder='Wrong password!';
+    setTimeout(()=>i.placeholder='Password',1500);
+  }
+}
+
+// ══ HOME ══
+function rHome(){
+  const vis=isAdm?games:games.filter(g=>!g.practice);
+  const pl=new Set(vis.flatMap(g=>g.results.map(r=>r.name))).size;
+  document.getElementById('hG').textContent=vis.length;
+  document.getElementById('hP').textContent=pl;
+  const last=vis[vis.length-1];
+  const lb=document.getElementById('lbanner');
+  if(last){
+    lb.style.display='block';
+    const md=['🥇','🥈','🥉'];
+    document.getElementById('lpodium').innerHTML=last.results.slice(0,3).map((r,i)=>`
+      <div class="pc g${i+1}"><div class="med">${md[i]}</div><div><div class="pn">${r.name}</div><div class="ps">${r.kills} kills · ${r.survivalTime}s</div></div></div>`).join('');
+    document.getElementById('lmeta').innerHTML=
+      [`Game #${last.id}`,last.date,`${last.participants} fighters`,`${last.duration}s`]
+      .map(t=>`<div style="font-size:11px;color:var(--mu);padding:3px 9px;background:var(--bg2);border:1px solid var(--b);border-radius:4px">${t}</div>`).join('');
+  } else lb.style.display='none';
+  const rg=document.getElementById('rg');
+  if(!vis.length){rg.innerHTML='<p style="color:var(--mu);font-size:12px">No games yet. Start one!</p>';return;}
+  rg.innerHTML=[...vis].reverse().slice(0,10).map(g=>`
+    <div class="gr-row" onclick="goG(${g.id})">
+      <span class="gn-lbl">#${g.id}${g.practice?'<span class="tag pr" style="margin-left:4px">P</span>':''}</span>
+      <span style="flex:1;font-size:12px;color:var(--mu)">🏆 ${g.results[0]?.name||'—'} · ${g.results[0]?.kills||0} kills</span>
+      <span style="font-size:11px;color:var(--mu)">${g.participants} fighters · ${g.date}</span>
+    </div>`).join('');
+}
+function goG(id){sp('stats');setTimeout(()=>{document.getElementById('gsel').value=id;loadGS();if(isAdm)document.getElementById('delbtn').style.display='block';},60);}
+
+// ══ SETTINGS ══
+function applyCfgToUI(){
+  // sliders
+  ['spd','dmg','mhp','khp'].forEach(id=>{
+    const map={spd:'speed',dmg:'dmg',mhp:'maxHP',khp:'killHP'};
+    const el=document.getElementById(id);
+    if(el){el.value=cfg[map[id]];document.getElementById(id+'v').textContent=parseFloat(cfg[map[id]]).toFixed(id==='spd'?1:0);}
+  });
+  // toggles
+  document.getElementById('krtog').classList.toggle('on',cfg.killReward);
+  ['gun','shield','ghost'].forEach(t=>{
+    document.getElementById(t+'Tog').classList.toggle('on',cfg[t+'Enabled']===true);
+  });
+  // counts
+  ['gun','shield','ghost'].forEach(t=>{
+    const ce=document.getElementById(t+'Count');if(ce)ce.value=cfg[t+'Count']||2;
+  });
+  // time pickers
+  const tp=[
+    ['gunDurM','gunDurS'],['gunSpawnM','gunSpawnS'],
+    ['shieldDurM','shieldDurS'],['shieldSpawnM','shieldSpawnS'],
+    ['ghostDurM','ghostDurS'],['ghostPickupDurM','ghostPickupDurS'],['ghostSpawnM','ghostSpawnS']
+  ];
+  tp.forEach(([m,s])=>{
+    const em=document.getElementById(m),es=document.getElementById(s);
+    if(em)em.value=cfg[m]||0;if(es)es.value=cfg[s]||0;
+  });
+}
+function rDL(){
+  const el=document.getElementById('dllist');
+  if(!parts.length){el.innerHTML='<p style="font-size:11px;color:var(--mu)">Add participants in Admin first.</p>';return;}
+  el.innerHTML=parts.map(p=>`
+    <div class="dl-item">
+      <input type="checkbox" style="accent-color:var(--green);cursor:pointer;width:auto;flex-shrink:0"
+        ${cfg.dlSet&&cfg.dlSet.includes(p.name)?'checked':''}
+        onchange="const n='${p.name.replace(/'/g,"\\'")}';if(this.checked){if(!cfg.dlSet.includes(n))cfg.dlSet.push(n);}else{cfg.dlSet=cfg.dlSet.filter(x=>x!==n);}">
+      <label style="cursor:pointer;flex:1">${p.name}</label>
+      <span style="font-size:10px;color:var(--mu)">${p.type==='bot'?'BOT':'YT'}</span>
+    </div>`).join('');
+}
+function saveCfg(){
+  cfg.speed=parseFloat(document.getElementById('spd').value);
+  cfg.dmg=parseInt(document.getElementById('dmg').value);
+  cfg.maxHP=parseInt(document.getElementById('mhp').value);
+  cfg.killHP=parseInt(document.getElementById('khp').value);
+  ['gun','shield','ghost'].forEach(t=>{
+    cfg[t+'Enabled']=document.getElementById(t+'Tog').classList.contains('on');
+    cfg[t+'Count']=parseInt(document.getElementById(t+'Count').value)||2;
+  });
+  const tp=['gunDurM','gunDurS','gunSpawnM','gunSpawnS',
+            'shieldDurM','shieldDurS','shieldSpawnM','shieldSpawnS',
+            'ghostDurM','ghostDurS','ghostPickupDurM','ghostPickupDurS','ghostSpawnM','ghostSpawnS'];
+  tp.forEach(k=>{const e=document.getElementById(k);if(e)cfg[k]=parseInt(e.value)||0;});
+  sv();
+  ntc('snote','✓ Settings saved!','ok');
+}
+
+// ══ ADMIN ══
+function rAdmin(){rAList();document.getElementById('botg').innerHTML=BOT_NAMES.map(b=>`<div class="bb" onclick="addBot('${b}')">${b}</div>`).join('');rAHist();}
+function rAList(){
+  document.getElementById('apc').textContent=parts.length;
+  document.getElementById('apl').innerHTML=parts.map((p,i)=>`
+    <div class="pi">
+      <div class="av" style="background:${COLORS[i%COLORS.length]}18;color:${COLORS[i%COLORS.length]};border-color:${COLORS[i%COLORS.length]}44">
+        ${p.thumb?`<img src="${p.thumb}" onerror="this.style.display='none'">`:p.name.slice(0,2).toUpperCase()}
+      </div>
+      <span class="pn2">${p.name}</span>
+      ${cfg.dlSet&&cfg.dlSet.includes(p.name)?'<span title="Double Life" style="font-size:12px">💚</span>':''}
+      <span class="tt ${p.type==='bot'?'bot':'yt'}">${p.type==='bot'?'BOT':'YT'}</span>
+      <span class="pr2" onclick="remP(${i})">×</span>
+    </div>`).join('');
+  rSB();
+  if(document.getElementById('page-settings').classList.contains('on'))rDL();
+}
+function rAHist(){
+  const el=document.getElementById('ah');
+  if(!games.length){el.innerHTML='<p style="color:var(--mu);font-size:12px">No games yet.</p>';return;}
+  el.innerHTML=[...games].reverse().slice(0,15).map(g=>`
+    <div class="history-item">
+      <span style="font-weight:700;color:var(--gold);min-width:50px">#${g.id}${g.practice?'<span style="font-size:9px;color:var(--cyan);margin-left:3px">P</span>':''}</span>
+      <span style="flex:1;color:var(--mu)">🏆 ${g.results[0]?.name||'—'}</span>
+      <span style="font-size:10px;color:var(--mu)">${g.date}</span>
+      <span class="del-x" onclick="admDelGame(${g.id},event)">✕</span>
+    </div>`).join('');
+}
+function admDelGame(id,e){
+  e.stopPropagation();
+  if(!confirm('Delete Game #'+id+'?'))return;
+  games=games.filter(g=>g.id!=id);sv();rAHist();rHome();loadSel();
+}
+function addP(){const v=document.getElementById('newp').value.trim();if(!v)return;if(!parts.find(p=>p.name===v))parts.push({name:v,type:'real'});document.getElementById('newp').value='';sv();rAList();}
+function addBot(n){let nm=n,c=1;while(parts.find(p=>p.name===nm))nm=n+(c++);parts.push({name:nm,type:'bot'});sv();rAList();}
+function addCBot(){const v=document.getElementById('cbot').value.trim()||'Bot'+Math.floor(Math.random()*999);let n=v,c=1;while(parts.find(p=>p.name===n))n=v+(c++);parts.push({name:n,type:'bot'});document.getElementById('cbot').value='';sv();rAList();}
+function remP(i){parts.splice(i,1);sv();rAList();}
+
+// ══ SCAN BOT ══
+let scanNames=[];
+function runScanBot(){
+  const raw=document.getElementById('scanInput').value;
+  scanNames=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+  if(!scanNames.length){ntc('anote','Paste at least one name.','warn');return;}
+  document.getElementById('scanList').innerHTML=scanNames.map((n,i)=>`
+    <div class="scan-item">
+      <span style="font-size:11px;color:var(--mu);min-width:20px">${i+1}.</span>
+      <input type="text" value="${n}" id="sn_${i}" style="flex:1;width:auto;padding:4px 8px;font-size:12px">
+    </div>`).join('');
+  document.getElementById('scanModal').classList.add('on');
+}
+function confirmScan(){
+  const added=[];
+  scanNames.forEach((_,i)=>{
+    const v=document.getElementById('sn_'+i)?.value.trim();
+    if(v&&!parts.find(p=>p.name===v)){parts.push({name:v,type:'real'});added.push(v);}
+  });
+  sv();rAList();
+  document.getElementById('scanModal').classList.remove('on');
+  document.getElementById('scanInput').value='';
+  ntc('anote',added.length+' players added!','ok');
+}
+
+// ══ WATCH SIDEBAR ══
+function rSB(){
+  const sb=document.getElementById('wsb');if(!isAdm){sb.innerHTML='';return;}
+  sb.innerHTML=`<div class="card">
+    <div class="ct"><span class="dot" style="background:var(--green)"></span>Roster (${parts.length})</div>
+    <div style="max-height:280px;overflow-y:auto">
+      ${running
+        ?fighters.map(f=>`
+          <div class="pi ${f.alive?'al':'dd'}">
+            <div class="av" style="background:${f.color}18;color:${f.color};border-color:${f.color}44">${f.name.slice(0,2).toUpperCase()}</div>
+            <span class="pn2">${f.name}</span>
+            <span style="font-size:10px;color:var(--mu)">${Math.max(0,Math.round(f.hp))}hp</span>
+            ${f.hasGun&&f.gunAmmo>0?'<span title="Gun">🔫</span>':''}
+            ${f.shieldTimer>0?'<span title="Shield">🛡</span>':''}
+            ${f.ghostTimer>0?'<span title="Ghost">👻</span>':''}
+            ${f.hasRevive?'<span title="Double Life">💚</span>':''}
+          </div>`).join('')
+        :parts.map((p,i)=>`
+          <div class="pi">
+            <div class="av" style="background:${COLORS[i%COLORS.length]}18;color:${COLORS[i%COLORS.length]};border-color:${COLORS[i%COLORS.length]}44">
+              ${p.thumb?`<img src="${p.thumb}" onerror="this.style.display='none'">`:p.name.slice(0,2).toUpperCase()}
+            </div>
+            <span class="pn2">${p.name}</span>
+            ${cfg.dlSet&&cfg.dlSet.includes(p.name)?'<span>💚</span>':''}
+            <span class="tt ${p.type==='bot'?'bot':'yt'}">${p.type==='bot'?'BOT':'YT'}</span>
+          </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════
+//        GAME ENGINE
+// ══════════════════════════════
+function getFR(){const n=Math.max(1,fighters.length||parts.length);return Math.max(14,Math.min(25,25-Math.floor(n*0.65)));}
+
+function startGame(prac){
+  if(running){ntc('anote','A game is already running!','warn');return;}
+  if(parts.length<2){ntc('anote','Need at least 2 participants!','warn');return;}
+  isPrac=prac;running=true;paused=false;gTime=0;elims=0;
+  kfeed=[];picks=[];bullets=[];borderHue=0;
+  gId=games.length+1;
+  // build pickup state
+  pickupState=[];
+  const pwDefs=[
+    {type:'gun',  enabled:cfg.gunEnabled,   count:cfg.gunCount,   dur:toSec(cfg.gunDurM,cfg.gunDurS),     spawnAt:toSec(cfg.gunSpawnM,cfg.gunSpawnS),     pickupDur:toSec(cfg.gunDurM,cfg.gunDurS)},
+    {type:'shield',enabled:cfg.shieldEnabled,count:cfg.shieldCount,dur:toSec(cfg.shieldDurM,cfg.shieldDurS),spawnAt:toSec(cfg.shieldSpawnM,cfg.shieldSpawnS),pickupDur:toSec(cfg.shieldDurM,cfg.shieldDurS)},
+    {type:'ghost', enabled:cfg.ghostEnabled, count:cfg.ghostCount,  dur:toSec(cfg.ghostDurM,cfg.ghostDurS),  spawnAt:toSec(cfg.ghostSpawnM,cfg.ghostSpawnS),  pickupDur:toSec(cfg.ghostPickupDurM,cfg.ghostPickupDurS)}
+  ];
+  pwDefs.forEach(d=>{
+    if(d.enabled&&d.count>0){
+      pickupState.push({type:d.type,remaining:d.count,nextSpawn:d.spawnAt,dur:d.dur*60,pickupDur:d.pickupDur*60,active:false});
+    }
+  });
+  const tg=document.getElementById('gtag');
+  tg.textContent=prac?'PRACTICE':'LIVE';tg.className=prac?'tag pr':'tag lv';
+  document.getElementById('glabel').textContent=`Game #${gId}${prac?' · practice':''}`;
+  document.getElementById('pauseBtn').style.display='inline-flex';
+  document.getElementById('pauseBtn').textContent='⏸ Pause';
+  const cv=document.getElementById('ac');cv.width=CS;cv.height=CS;
+  initF();
+  gInt=setInterval(()=>{
+    if(paused)return;
+    gTime++;
+    document.getElementById('sT').textContent=gTime+'s';
+    tickPicks();
+  },1000);
+  sp('watch');
+  requestAnimationFrame(loop);
+}
+
+function togglePause(){
+  paused=!paused;
+  document.getElementById('pauseBtn').textContent=paused?'▶ Resume':'⏸ Pause';
+}
+
+function endGame(){
+  if(!running){ntc('anote','No game running.','warn');return;}
+  running=false;paused=false;
+  clearInterval(gInt);if(aFr)cancelAnimationFrame(aFr);
+  document.getElementById('gtag').textContent='Ended';document.getElementById('gtag').className='tag en';
+  document.getElementById('pauseBtn').style.display='none';
+  saveRes();rLB();rSB();
+}
+
+function initF(){
+  const n=parts.length,spd=cfg.speed*(n>10?.7:n>6?.85:1);
+  fighters=parts.map((p,i)=>{
+    const ang=(i/n)*Math.PI*2+(Math.random()-.5)*.4,s=spd*(.8+Math.random()*.4);
+    return{name:p.name,type:p.type,color:COLORS[i%COLORS.length],thumb:p.thumb||null,
+      x:PAD+22+Math.random()*(CS-2*(PAD+22)),y:PAD+22+Math.random()*(CS-2*(PAD+22)),
+      vx:Math.cos(ang)*s,vy:Math.sin(ang)*s,
+      hp:cfg.maxHP,maxHP:cfg.maxHP,alive:true,kills:0,
+      survivalTime:0,killedBy:null,flashTimer:0,
+      hasGun:false,gunAngle:0,gunCooldown:0,gunAmmo:0,
+      hasRevive:cfg.dlSet&&cfg.dlSet.includes(p.name),revived:false,
+      shieldTimer:0,ghostTimer:0};
+  });
+}
+
+// ── PICKUP TICK ──
+function tickPicks(){
+  // age existing pickups
+  picks.forEach(pk=>{pk.life--;});
+  picks=picks.filter(pk=>pk.life>0);
+  // check spawns
+  pickupState.forEach(ps=>{
+    if(ps.remaining<=0)return;
+    if(!picks.find(pk=>pk.type===ps.type)){
+      ps.nextSpawn--;
+      if(ps.nextSpawn<=0){
+        picks.push({type:ps.type,
+          x:PAD+35+Math.random()*(CS-2*(PAD+35)),
+          y:PAD+35+Math.random()*(CS-2*(PAD+35)),
+          life:ps.pickupDur,maxLife:ps.pickupDur});
+        ps.remaining--;
+        // next spawn: same interval as first
+        if(ps.remaining>0) ps.nextSpawn=toSec(
+          ps.type==='gun'?cfg.gunSpawnM:ps.type==='shield'?cfg.shieldSpawnM:cfg.ghostSpawnM,
+          ps.type==='gun'?cfg.gunSpawnS:ps.type==='shield'?cfg.shieldSpawnS:cfg.ghostSpawnS
+        )||20;
+      }
+    }
+  });
+}
+
+// ── PHYSICS ──
+function upd(){
+  const R=getFR(),min=PAD+R,max=CS-PAD-R;
+  const alive=fighters.filter(f=>f.alive);
+  alive.forEach(f=>{
+    f.x+=f.vx;f.y+=f.vy;
+    if(f.x<=min){f.x=min;f.vx=Math.abs(f.vx);}
+    if(f.x>=max){f.x=max;f.vx=-Math.abs(f.vx);}
+    if(f.y<=min){f.y=min;f.vy=Math.abs(f.vy);}
+    if(f.y>=max){f.y=max;f.vy=-Math.abs(f.vy);}
+    if(f.flashTimer>0)f.flashTimer--;
+    if(f.shieldTimer>0)f.shieldTimer--;
+    if(f.ghostTimer>0)f.ghostTimer--;
+    f.survivalTime=gTime;
+    // gun rotation + fire
+    if(f.hasGun&&f.gunAmmo>0){
+      f.gunAngle+=0.06;f.gunCooldown--;
+      if(f.gunCooldown<=0){
+        const ts=alive.filter(e=>e!==f&&!e.ghostTimer);
+        if(ts.length){const t=ts[Math.floor(Math.random()*ts.length)];const dx=t.x-f.x,dy=t.y-f.y,d=Math.sqrt(dx*dx+dy*dy)||1;bullets.push({x:f.x,y:f.y,vx:(dx/d)*5.5,vy:(dy/d)*5.5,owner:f,life:110,color:f.color});}
+        f.gunAmmo--;f.gunCooldown=55;if(f.gunAmmo<=0)f.hasGun=false;
+      }
+    }
+    // pickup collection
+    picks.forEach((pk,pi)=>{
+      const dx=f.x-pk.x,dy=f.y-pk.y;
+      if(dx*dx+dy*dy<(R+14)*(R+14)){
+        const pwDur=pickupState.find(ps=>ps.type===pk.type)?.dur||300;
+        if(pk.type==='gun'){f.hasGun=true;f.gunAmmo=3;f.gunCooldown=20;addKF('🔫 '+f.name+' grabbed the Gun!');}
+        if(pk.type==='shield'){f.shieldTimer=pwDur;addKF('🛡 '+f.name+' grabbed the Shield!');}
+        if(pk.type==='ghost'){f.ghostTimer=pwDur;addKF('👻 '+f.name+' is Ghost!');}
+        picks.splice(pi,1);
+      }
+    });
+  });
+  // bullets
+  bullets=bullets.filter(b=>{
+    b.x+=b.vx;b.y+=b.vy;b.life--;
+    if(b.x<PAD||b.x>CS-PAD||b.y<PAD||b.y>CS-PAD||b.life<=0)return false;
+    const R2=getFR();
+    for(const f of fighters){
+      if(!f.alive||f===b.owner||f.shieldTimer>0||f.ghostTimer>0)continue;
+      const dx=f.x-b.x,dy=f.y-b.y;
+      if(dx*dx+dy*dy<R2*R2){f.hp-=cfg.dmg*1.5;f.flashTimer=8;chkDie(f,b.owner);return false;}
+    }
+    return true;
+  });
+  // collisions
+  for(let i=0;i<alive.length;i++)for(let j=i+1;j<alive.length;j++){
+    const a=alive[i],b=alive[j];
+    const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy),R2=getFR()*2;
+    if(d<R2&&d>.1){
+      const nx=dx/d,ny=dy/d,ov=(R2-d)/2+.5;
+      a.x+=nx*ov;a.y+=ny*ov;b.x-=nx*ov;b.y-=ny*ov;
+      const dv=a.vx-b.vx,dvY=a.vy-b.vy,dot=dv*nx+dvY*ny;
+      if(dot<0){a.vx-=dot*nx;a.vy-=dot*ny;b.vx+=dot*nx;b.vy+=dot*ny;}
+      const aGhost=a.ghostTimer>0,bGhost=b.ghostTimer>0;
+      if(!a.shieldTimer&&!bGhost&&!aGhost){a.hp-=cfg.dmg;a.flashTimer=10;}
+      if(!b.shieldTimer&&!aGhost&&!bGhost){b.hp-=cfg.dmg;b.flashTimer=10;}
+      if(!aGhost)chkDie(a,b);
+      if(!bGhost)chkDie(b,a);
+    }
+  }
+}
+
+function chkDie(f,killer){
+  if(f.hp<=0&&f.alive){
+    if(f.hasRevive&&!f.revived){f.hp=f.maxHP*.5;f.revived=true;addKF('💚 '+f.name+' revived!');}
+    else{
+      f.alive=false;f.killedBy=killer.name;killer.kills++;elims++;
+      if(cfg.killReward)killer.hp=Math.min(killer.maxHP,killer.hp+cfg.killHP);
+      addKF(killer.name+' eliminated '+f.name);
+    }
+  }
+}
+
+// ── DRAW ──
+function draw(){
+  const cv=document.getElementById('ac'),ctx=cv.getContext('2d'),S=CS;
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.clearRect(0,0,S,S);
+  ctx.fillStyle='#050508';ctx.fillRect(0,0,S,S);
+  // grid
+  ctx.strokeStyle='#0d0d1c';ctx.lineWidth=1;
+  for(let x=PAD;x<=S-PAD;x+=44){ctx.beginPath();ctx.moveTo(x+.5,PAD);ctx.lineTo(x+.5,S-PAD);ctx.stroke();}
+  for(let y=PAD;y<=S-PAD;y+=44){ctx.beginPath();ctx.moveTo(PAD,y+.5);ctx.lineTo(S-PAD,y+.5);ctx.stroke();}
+  // animated border
+  borderHue=(borderHue+.2)%360;
+  const bg=ctx.createLinearGradient(PAD,PAD,S-PAD,S-PAD);
+  bg.addColorStop(0,`hsl(${borderHue},65%,50%)`);bg.addColorStop(.5,`hsl(${(borderHue+100)%360},65%,50%)`);bg.addColorStop(1,`hsl(${(borderHue+200)%360},65%,50%)`);
+  ctx.strokeStyle=bg;ctx.lineWidth=1.8;ctx.strokeRect(PAD+.5,PAD+.5,S-PAD*2-1,S-PAD*2-1);
+  // corner accents
+  ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=1;
+  [[PAD,PAD],[S-PAD,PAD],[S-PAD,S-PAD],[PAD,S-PAD]].forEach(([cx,cy])=>{
+    const dx=cx===PAD?1:-1,dy=cy===PAD?1:-1,sz=11;
+    ctx.beginPath();ctx.moveTo(cx,cy+dy*sz);ctx.lineTo(cx,cy);ctx.lineTo(cx+dx*sz,cy);ctx.stroke();
+  });
+
+  // PAUSE overlay
+  if(paused){
+    ctx.fillStyle='rgba(8,8,20,.7)';ctx.fillRect(PAD,PAD,S-PAD*2,S-PAD*2);
+    ctx.fillStyle='#e8e8f8';ctx.font='bold 22px -apple-system,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('⏸  PAUSED',S/2,S/2);
+    return;
+  }
+
+  // pickups
+  const now=Date.now();
+  picks.forEach(pk=>{
+    const pulse=.65+.35*Math.sin(now/350);
+    const pc=pk.type==='gun'?'#5599e0':pk.type==='shield'?'#c084fc':'#f97316';
+    ctx.save();ctx.globalAlpha=pulse;
+    ctx.beginPath();ctx.arc(pk.x,pk.y,12,0,Math.PI*2);ctx.fillStyle=pc+'25';ctx.fill();
+    ctx.strokeStyle=pc;ctx.lineWidth=1.5;ctx.stroke();ctx.globalAlpha=1;
+    ctx.font='14px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(pk.type==='gun'?'🔫':pk.type==='shield'?'🛡':'👻',pk.x,pk.y);
+    const pct=pk.life/pk.maxLife;
+    ctx.fillStyle='#18182a';ctx.fillRect(pk.x-12,pk.y+15,24,2.5);
+    ctx.fillStyle=pc;ctx.fillRect(pk.x-12,pk.y+15,24*pct,2.5);
+    ctx.restore();
+  });
+
+  // bullets
+  bullets.forEach(b=>{
+    ctx.save();ctx.beginPath();ctx.arc(b.x,b.y,3,0,Math.PI*2);ctx.fillStyle=b.color;ctx.fill();
+    ctx.globalAlpha=.4;ctx.beginPath();ctx.arc(b.x,b.y,5.5,0,Math.PI*2);ctx.fillStyle=b.color;ctx.fill();ctx.restore();
+  });
+
+  const R=getFR();
+  fighters.forEach(f=>{
+    if(!f.alive)return;
+    const flash=f.flashTimer>0&&Math.floor(f.flashTimer/2)%2===0;
+    const shielded=f.shieldTimer>0,ghosted=f.ghostTimer>0;
+    ctx.save();
+    // ghost aura
+    if(ghosted){
+      ctx.globalAlpha=.45;
+      ctx.beginPath();ctx.arc(f.x,f.y,R*1.9,0,Math.PI*2);
+      ctx.fillStyle='#f9731625';ctx.fill();
+      ctx.strokeStyle='#f97316';ctx.lineWidth=1;
+      ctx.setLineDash([3,5]);ctx.stroke();ctx.setLineDash([]);
+      ctx.globalAlpha=1;
+    }
+    // shield ring
+    if(shielded){
+      const t=now/700;ctx.beginPath();ctx.arc(f.x,f.y,R+7,0,Math.PI*2);
+      ctx.strokeStyle='#c084fc';ctx.lineWidth=1.8;ctx.setLineDash([6,4]);ctx.lineDashOffset=-t*12;ctx.stroke();ctx.setLineDash([]);
+    }
+    // glow
+    const gr=ctx.createRadialGradient(f.x,f.y,R*.2,f.x,f.y,R*1.8);
+    gr.addColorStop(0,f.color+'28');gr.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.arc(f.x,f.y,R*1.8,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+    // circle
+    ctx.beginPath();ctx.arc(f.x,f.y,R,0,Math.PI*2);
+    ctx.fillStyle=flash?'#ffffff14':(ghosted?f.color+'30':f.color+'18');ctx.fill();
+    ctx.strokeStyle=flash?'#fff':(ghosted?'#f97316':f.color);ctx.lineWidth=2;ctx.stroke();
+    // initials
+    ctx.fillStyle=flash?'#fff':(ghosted?'#f97316':f.color);
+    ctx.font=`700 ${Math.max(9,R-7)}px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(f.name.slice(0,2).toUpperCase(),f.x,f.y);
+    // gun dot
+    if(f.hasGun&&f.gunAmmo>0){
+      const gx=f.x+Math.cos(f.gunAngle)*(R+5.5),gy=f.y+Math.sin(f.gunAngle)*(R+5.5);
+      ctx.beginPath();ctx.arc(gx,gy,3.5,0,Math.PI*2);ctx.fillStyle='#5599e0';ctx.fill();
+      ctx.globalAlpha=.4;ctx.beginPath();ctx.arc(gx,gy,5.5,0,Math.PI*2);ctx.fillStyle='#5599e0';ctx.fill();ctx.globalAlpha=1;
+    }
+    // name
+    ctx.font=`${Math.max(8,R-10)}px -apple-system,sans-serif`;ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fillText(f.name.length>9?f.name.slice(0,9)+'…':f.name,f.x,f.y+R+9);
+    // HP bar
+    const hpPct=Math.max(0,f.hp)/f.maxHP,bw=R*2+8;
+    ctx.fillStyle='#141428';
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(f.x-bw/2,f.y-R-11,bw,4.5,2);ctx.fill();}
+    else ctx.fillRect(f.x-bw/2,f.y-R-11,bw,4.5);
+    ctx.fillStyle=hpPct>.5?'#4ade80':hpPct>.25?'#facc15':'#e05555';
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(f.x-bw/2,f.y-R-11,bw*hpPct,4.5,2);ctx.fill();}
+    else ctx.fillRect(f.x-bw/2,f.y-R-11,bw*hpPct,4.5);
+    ctx.restore();
+  });
+}
+
+function loop(){
+  if(!running)return;
+  if(!paused){upd();}
+  draw();
+  document.getElementById('sA').textContent=fighters.filter(f=>f.alive).length;
+  document.getElementById('sK').textContent=elims;
+  kfeed.forEach(k=>k.t--);kfeed=kfeed.filter(k=>k.t>0);
+  if(isAdm)rSB();
+  if(!paused&&fighters.filter(f=>f.alive).length<=1){
+    setTimeout(()=>{
+      running=false;paused=false;clearInterval(gInt);if(aFr)cancelAnimationFrame(aFr);
+      document.getElementById('gtag').textContent='Ended';document.getElementById('gtag').className='tag en';
+      document.getElementById('pauseBtn').style.display='none';
+      saveRes();rLB();rSB();
+    },1200);return;
+  }
+  aFr=requestAnimationFrame(loop);
+}
+
+function addKF(msg){
+  kfeed.unshift({msg,t:330});if(kfeed.length>5)kfeed.pop();
+  document.getElementById('kf').innerHTML=kfeed.slice(0,5).map(k=>`<div class="ke">${k.msg}</div>`).join('');
+}
+
+function saveRes(){
+  const al=fighters.filter(f=>f.alive).sort((a,b)=>b.kills-a.kills);
+  const de=fighters.filter(f=>!f.alive).sort((a,b)=>b.survivalTime-a.survivalTime);
+  games.push({id:gId,practice:isPrac,
+    date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short'}),
+    duration:gTime,participants:parts.length,
+    results:[...al,...de].map((f,i)=>({rank:i+1,name:f.name,type:f.type,
+      kills:f.kills,survivalTime:f.survivalTime||gTime,killedBy:f.killedBy||null}))});
+  sv();loadSel();if(isAdm)rAHist();rHome();
+}
+
+function rLB(){
+  const last=games[games.length-1];if(!last)return;
+  if(last.practice&&!isAdm)return;
+  const md=['🥇','🥈','🥉'];
+  document.getElementById('wlb').innerHTML=`
+    <div style="font-size:13px;font-weight:800;margin-bottom:8px">
+      Game #${last.id} Results ${last.practice?'<span class="tag pr">PRACTICE</span>':''}
+    </div>
+    <div class="pod-row">${last.results.slice(0,3).map((r,i)=>`
+      <div class="pc g${i+1}"><div class="med">${md[i]}</div><div><div class="pn">${r.name}</div><div class="ps">${r.kills} kills · ${r.survivalTime}s</div></div></div>`).join('')}</div>`;
+}
+
+// ══ STATS ══
+function loadSel(){
+  const sel=document.getElementById('gsel');const cur=sel.value;
+  sel.innerHTML='<option value="">— Select a game —</option>';
+  const vis=isAdm?games:games.filter(g=>!g.practice);
+  vis.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=`Game #${g.id}${g.practice?' (Practice)':''} — ${g.date}`;sel.appendChild(o);});
+  if(cur)sel.value=cur;else if(vis.length){sel.value=vis[vis.length-1].id;loadGS();}
+}
+function loadGS(){
+  const id=document.getElementById('gsel').value;
+  document.getElementById('delbtn').style.display=isAdm&&id?'block':'none';
+  if(!id){document.getElementById('sc').innerHTML='<p style="color:var(--mu);font-size:12px">Select a game above.</p>';return;}
+  const g=games.find(gm=>gm.id==id);if(!g)return;
+  const md=['🥇','🥈','🥉'];
+  const topK=[...g.results].sort((a,b)=>b.kills-a.kills)[0];
+  const topS=[...g.results].sort((a,b)=>b.survivalTime-a.survivalTime)[0];
+  document.getElementById('sc').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <div class="pc g1"><div class="med">🏆</div><div><div class="ps" style="font-size:10px">Most kills</div><div class="pn">${topK.name} (${topK.kills})</div></div></div>
+      <div class="pc g2"><div class="med">⏱</div><div><div class="ps" style="font-size:10px">Longest survival</div><div class="pn">${topS.name} (${topS.survivalTime}s)</div></div></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;overflow:hidden">
+      <table class="ft"><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Kills</th><th>Time</th><th>Eliminated by</th></tr></thead>
+      <tbody>${g.results.map((r,i)=>`<tr>
+        <td style="font-weight:800;color:var(--gold)">${md[i]||('#'+r.rank)}</td>
+        <td style="font-weight:600">${r.name}</td>
+        <td><span class="tt ${r.type==='bot'?'bot':'yt'}">${r.type==='bot'?'BOT':'YT'}</span></td>
+        <td style="color:var(--red)">${r.kills}</td>
+        <td style="color:var(--mu)">${r.survivalTime}s</td>
+        <td style="color:var(--mu)">${r.killedBy||'—'}</td>
+      </tr>`).join('')}</tbody></table>
+    </div>`;
+}
+function delGame(){
+  const id=document.getElementById('gsel').value;if(!id)return;
+  if(!confirm('Delete Game #'+id+'? Cannot be undone.'))return;
+  games=games.filter(g=>g.id!=id);sv();loadSel();
+  document.getElementById('sc').innerHTML='<p style="color:var(--mu);font-size:12px">Game deleted.</p>';
+  document.getElementById('delbtn').style.display='none';
+  rHome();if(isAdm)rAHist();
+}
+function searchP(){
+  const name=document.getElementById('pInput').value.trim().toLowerCase();
+  const rc=document.getElementById('pcard');
+  if(!name){rc.style.display='none';return;}
+  const vis=games.filter(g=>!g.practice||isAdm);
+  const found=[];vis.forEach(g=>{const r=g.results.find(p=>p.name.toLowerCase()===name);if(r)found.push({gameId:g.id,date:g.date,...r});});
+  if(!found.length){
+    rc.style.display='block';rc.style.borderColor='var(--red)';
+    document.getElementById('pnm').innerHTML='<span style="color:var(--mu)">No player found.</span>';
+    document.getElementById('pst').innerHTML='';document.getElementById('prec').innerHTML='';return;
+  }
+  const tK=found.reduce((s,f)=>s+f.kills,0);
+  const wins=found.filter(f=>f.rank===1).length;
+  const avgR=(found.reduce((s,f)=>s+f.rank,0)/found.length).toFixed(1);
+  const avgK=(tK/found.length).toFixed(1);
+  const avgT=Math.round(found.reduce((s,f)=>s+f.survivalTime,0)/found.length);
+  rc.style.display='block';rc.style.borderColor='var(--blue)';
+  document.getElementById('pnm').innerHTML=`<span style="font-size:18px;font-weight:800">${found[0].name}</span><span class="tt yt" style="margin-left:4px">YT</span>`;
+  document.getElementById('pst').innerHTML=`
+    <div class="psb"><div class="n2" style="color:var(--gold)">${found.length}</div><div class="l2">Games</div></div>
+    <div class="psb"><div class="n2" style="color:var(--red)">${tK}</div><div class="l2">Total Kills</div></div>
+    <div class="psb"><div class="n2" style="color:var(--green)">${wins}</div><div class="l2">Wins 🏆</div></div>
+    <div class="psb"><div class="n2" style="color:var(--blue)">#${avgR}</div><div class="l2">Avg Rank</div></div>
+    <div class="psb"><div class="n2" style="color:var(--cyan)">${avgK}</div><div class="l2">Avg Kills</div></div>
+    <div class="psb"><div class="n2" style="color:var(--purple)">${avgT}s</div><div class="l2">Avg Time</div></div>`;
+  document.getElementById('prec').innerHTML=found.slice(-5).reverse().map(f=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--card);border-radius:6px;font-size:12px;margin-bottom:4px">
+      <span style="font-weight:700;color:var(--gold);min-width:24px">#${f.rank}</span>
+      <span style="flex:1">Game #${f.gameId}</span>
+      <span style="color:var(--red)">${f.kills} kills</span>
+      <span style="color:var(--mu);margin-left:8px">${f.survivalTime}s</span>
+      <span style="font-size:10px;color:var(--mu);margin-left:8px">${f.date}</span>
+    </div>`).join('');
+}
+
+// ══ INIT ══
+(function init(){
+  const cv=document.getElementById('ac');cv.width=CS;cv.height=CS;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#050508';ctx.fillRect(0,0,CS,CS);
+  const ig=ctx.createLinearGradient(PAD,PAD,CS-PAD,CS-PAD);
+  ig.addColorStop(0,'#e05555');ig.addColorStop(1,'#5599e0');
+  ctx.strokeStyle=ig;ctx.lineWidth=1.8;ctx.strokeRect(PAD+.5,PAD+.5,CS-PAD*2-1,CS-PAD*2-1);
+  ctx.fillStyle='#252535';ctx.font='13px -apple-system,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('Waiting for the next battle...',CS/2,CS/2);
+  rHome();loadSel();
+})();
+</script>
+</body>
+</html>
